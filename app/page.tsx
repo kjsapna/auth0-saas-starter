@@ -8,6 +8,8 @@ import { Auth0Logo } from "@/components/auth0-logo"
 import { SignUpForm } from "./signup-form"
 import { WelcomeBackCard } from "./welcome-back-card"
 import { SubmitButton } from "@/components/submit-button"
+import { redirect } from 'next/navigation'
+
 
 export default async function Home() {
   const session = await appClient.getSession()
@@ -25,18 +27,20 @@ export default async function Home() {
           <SubmitButton>Logout</SubmitButton>
         </a>
       ) : (
-        <div
-          className="absolute right-4 top-4 md:right-8 md:top-8"
-        ><span className="text-sm">Already joined?</span> <a
-          className="text-sm underline"
-          href="/api/auth/login"
-        >
-          <SubmitButton>Log in</SubmitButton>
-        </a>
-        </div>
+        // <div
+        //   className="absolute right-4 top-4 md:right-8 md:top-8"
+        // ><span className="text-sm">Already joined?</span> <a
+        //   className="text-sm underline"
+        //   href="/api/auth/login"
+        // >
+        //   <SubmitButton>Log in</SubmitButton>
+        // </a>
+        // </div>
+
+        redirect("/api/auth/login")
       )}
 
-      <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
+      {/* <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
         <div className="absolute inset-0 bg-black" />
         <div className="relative z-20 flex items-center text-lg font-medium">
           <Auth0Logo className="mr-2 size-8" />
@@ -60,7 +64,7 @@ export default async function Home() {
       </div>
       <div className="lg:p-8 flex h-screen">
         {session ? <WelcomeBackCard /> : <SignUpForm />}
-      </div>
+      </div> */}
     </div>
   )
 }
