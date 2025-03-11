@@ -9,16 +9,13 @@ export default async function DashboardHome() {
       <div className="flex flex-1 items-center justify-center rounded-3xl border bg-field shadow-sm">
         <div className="flex max-w-[500px] flex-col items-center gap-1 text-center">
           <h3 className="text-2xl font-bold tracking-tight">
-            Explore the SaaS Starter
+          Explore the NexGen App Dashboard
           </h3>
           <p className="mt-3 text-muted-foreground">
-            This reference app demonstrates how to build a multi-tenant B2B SaaS
-            application powered by Auth0 by Okta.
+          The NexGen App Dashboard is your hub for managing a multi-tenant B2B SaaS application.
           </p>
           <p className="mt-3 text-muted-foreground">
-            Head over to the Settings Dashboard to explore common administrative
-            capabilities like membership management, single sign-on
-            configuration, and security policies.
+          isit the Settings Dashboard to explore key administrative features such as membership management, single sign-on (SSO) configuration, and security policies to streamline your organization's access and security.
           </p>
           <div className="mt-8">
             <Link href="/dashboard/organization/general" className="w-full">
