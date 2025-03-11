@@ -2,7 +2,7 @@ import Link from "next/link"
 import { redirect } from "next/navigation"
 import { ArrowLeftIcon } from "@radix-ui/react-icons"
 
-import { appClient } from "@/lib/auth0"
+import { appClient,managementClient } from "@/lib/auth0"
 import { getRole } from "@/lib/roles"
 import { Button } from "@/components/ui/button"
 import {
@@ -11,8 +11,10 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  CardContent,
 } from "@/components/ui/card"
 import { SidebarNav } from "@/components/sidebar-nav"
+import { MembersList } from "./memberList"
 
 const sidebarNavItems = [
   {
@@ -46,32 +48,18 @@ export default async function AccountLayout({ children }: AccountLayoutProps) {
   }
 
   if (getRole(session.user) !== "admin") {
+    const { data: members } = await managementClient.organizations.getMembers({
+      id: session!.user.org_id,
+      fields: ["user_id", "name", "email", "picture"].join(","),
+      include_fields: true,
+    })
     return (
-      <div className="flex items-center justify-center">
-        <Card className="w-[450px]">
-          <CardHeader>
-            <CardTitle>Unauthorized</CardTitle>
-            <CardDescription className="space-y-1.5">
-              <p>
-                You’re currently logged in with the role of{" "}
-                <span className="font-semibold">{getRole(session.user)}</span>.
-              </p>
-              <p>
-                Log in as an Organization member with the{" "}
-                <span className="font-semibold">admin</span> role to manage your
-                Organization&apos;s settings.
-              </p>
-            </CardDescription>
-          </CardHeader>
-          <CardFooter>
-            <Link href="/dashboard" className="w-full">
-              <Button className="w-full">
-                <ArrowLeftIcon className="mr-2 h-4 w-4" /> Go Back to Home
-              </Button>
-            </Link>
-          </CardFooter>
-        </Card>
-      </div>
+      <MembersList members={members.map((m) => ({
+                id: m.user_id,
+                name: m.name,
+                email: m.email,
+                picture: m.picture,
+              }))}/>
     )
   }
 
