@@ -15,7 +15,7 @@ export default async function DashboardHome() {
           The NexGen App Dashboard is your hub for managing a multi-tenant B2B SaaS application.
           </p>
           <p className="mt-3 text-muted-foreground">
-          isit the Settings Dashboard to explore key administrative features such as membership management, single sign-on (SSO) configuration, and security policies to streamline your organization's access and security.
+            {"Settings Dashboard to explore key administrative features such as membership management, single sign-on (SSO) configuration,and security policies to streamline your organization's access and security."}   
           </p>
           <div className="mt-8">
             <Link href="/dashboard/organization/general" className="w-full">
