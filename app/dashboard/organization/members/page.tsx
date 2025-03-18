@@ -13,6 +13,14 @@ export default async function Members() {
     fields: ["user_id", "name", "email", "picture", "roles"].join(","),
     include_fields: true,
   })
+
+  const membersWithStatus = await Promise.all(
+    members.map(async (member) => {
+      const user = await managementClient.users.get({ id: member.user_id });
+      return { ...member, blocked: user.data.blocked ?? false };
+    })
+  );
+
   const { data: invitations } =
     await managementClient.organizations.getInvitations({
       id: session!.user.org_id,
@@ -26,12 +34,13 @@ export default async function Members() {
       />
 
       <MembersList
-        members={members.map((m) => ({
+        members={membersWithStatus.map((m) => ({
           id: m.user_id,
           name: m.name,
           email: m.email,
           picture: m.picture,
           role: ((m.roles && m.roles[0]?.name) || "member") as Role,
+          blocked:m.blocked
         }))}
       />
 

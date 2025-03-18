@@ -121,6 +121,39 @@ export const removeMember = withServerActionAuth(
   }
 )
 
+export const blockMember = withServerActionAuth(
+  async function blockMember(userId: string, blocked:boolean, session: Session) {
+    if (userId === session.user.sub) {
+      return {
+        error: "You cannot block yourself from an organization.",
+      }
+    }
+
+    try {
+      await managementClient.users.update(
+        {
+          id: userId,
+        },
+        {
+          blocked:!blocked
+        }
+      )
+
+      revalidatePath("/dashboard/organization/members")
+    } catch (error) {
+      console.error("failed to remove member", error)
+      return {
+        error: "Failed to remove member.",
+      }
+    }
+
+    return {}
+  },
+  {
+    role: "admin",
+  }
+)
+
 export const updateRole = withServerActionAuth(
   async function updateRole(userId: string, role: Role, session: Session) {
     if (userId === session.user.sub) {
@@ -182,6 +215,36 @@ export const updateRole = withServerActionAuth(
       }
     }
 
+    return {}
+  },
+  {
+    role: "admin",
+  }
+)
+export const passwordResetLink = withServerActionAuth(
+  async function passwordResetLink(userId: string,email:string,session:Session) {
+  
+
+    try {
+      const body = {
+        email,
+       
+        result_url:`https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}/password-reset-success`,
+        ttl_sec: 600, // Link expires in 10 minutes
+        mark_email_as_verified: true,
+        connection_id:process.env.DEFAULT_CONNECTION_ID
+      }
+      const response = await managementClient.tickets.changePassword(body);
+      return { resetLink: response.data.ticket};
+  
+      
+    } catch (error) {
+      console.error("failed to sent reset password link", error)
+      return {
+        error: "Failed  to sent reset password link.",
+      }
+    }
+    
     return {}
   },
   {

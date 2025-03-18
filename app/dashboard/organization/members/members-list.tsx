@@ -1,6 +1,6 @@
 "use client"
 
-import { DotsVerticalIcon, TrashIcon } from "@radix-ui/react-icons"
+import { DotsVerticalIcon, TrashIcon  } from "@radix-ui/react-icons"
 import { toast } from "sonner"
 
 import { Role } from "@/lib/roles"
@@ -36,7 +36,8 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-import { removeMember, updateRole } from "./actions"
+import { blockMember, removeMember, updateRole,passwordResetLink } from "./actions"
+import { BanIcon, BotIcon, LockIcon } from "lucide-react"
 
 interface Props {
   members: {
@@ -44,11 +45,15 @@ interface Props {
     name: string
     email: string
     picture: string
-    role: Role
+    role: Role,
+    blocked:boolean
   }[]
 }
 
 export function MembersList({ members }: Props) {
+
+  
+
   return (
     <Card>
       <CardHeader>
@@ -116,6 +121,23 @@ export function MembersList({ members }: Props) {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                        className="text-destructive"
+                        onSelect={async () => {
+                          const resetData:any= await passwordResetLink(member.id,member.email)
+                          if (resetData.error) {
+                            return toast.error(resetData.error)
+                          }
+                          
+                          console.log(resetData)
+
+                          toast.success(`Password reset link has been sent to member: ${member.email}. Please check your email`)
+                          return { resetLink: resetData.ticket };
+                        }}
+                      >
+                        <LockIcon className="mr-1 size-4" />
+                        Reset Password 
+                      </DropdownMenuItem>
                       <DropdownMenuItem
                         className="text-destructive"
                         onSelect={async () => {
@@ -130,9 +152,26 @@ export function MembersList({ members }: Props) {
                         <TrashIcon className="mr-1 size-4" />
                         Delete
                       </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-destructive"
+                        onSelect={async () => {
+                          const { error } = await blockMember(member.id,member.blocked)
+                          if (error) {
+                            return toast.error(error)
+                          }
+
+                          const message = member.blocked ? 'Memeber ':'Block'
+
+                          toast.success(`Member: ${member.email} has been ${!member.blocked ? 'Blocked ':'UnBlocked'}`)
+                        }}
+                      >
+                        <BanIcon className="mr-1 size-4" />
+                        {member.blocked ? 'UnBlock':'Block'}
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
+                
               </TableRow>
             ))}
           </TableBody>

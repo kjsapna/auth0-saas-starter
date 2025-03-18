@@ -27,6 +27,7 @@ export async function updateDisplayName(formData: FormData) {
       },
       {
         name: displayName,
+      
       }
     )
 
@@ -69,3 +70,24 @@ export async function deleteAccount() {
     }
   }
 }
+
+export async function changePassword(userId:string, newPassword:string) {
+  try {
+    const session=await appClient.getSession();
+    await managementClient.users.update(
+      {
+        id: session?.user.sub,
+      },
+      {
+        password: newPassword,
+      }
+    )
+
+    return { success: true, message: "Password changed successfully." };
+    
+  } catch (error:any) {
+    console.error("Error changing password:", error);
+    return { success: false, error: error.message };
+  }
+}
+
