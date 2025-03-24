@@ -223,20 +223,25 @@ export const updateRole = withServerActionAuth(
 )
 export const passwordResetLink = withServerActionAuth(
   async function passwordResetLink(userId: string,email:string,session:Session) {
-  
-
     try {
-      const body = {
-        email,
-       
-        result_url:`https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}/password-reset-success`,
-        ttl_sec: 600, // Link expires in 10 minutes
-        mark_email_as_verified: true,
-        connection_id:process.env.DEFAULT_CONNECTION_ID
-      }
-      const response = await managementClient.tickets.changePassword(body);
-      return { resetLink: response.data.ticket};
-  
+     
+      const response = await fetch(`https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}/dbconnections/change_password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          client_id: process.env.AUTH0_CLIENT_ID,
+          email,
+          connection: process.env.DEFAULT_CONNECTION,
+          organization_id: process.env.DEFAULT_CONNECTION_ID
+        })
+      });
+        revalidatePath("/dashboard/organization/members")
+      
+        console.log("If the email exists, a reset link has been sent.");
+      
       
     } catch (error) {
       console.error("failed to sent reset password link", error)

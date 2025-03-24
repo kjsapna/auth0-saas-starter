@@ -124,15 +124,12 @@ export function MembersList({ members }: Props) {
                     <DropdownMenuItem
                         className="text-destructive"
                         onSelect={async () => {
-                          const resetData:any= await passwordResetLink(member.id,member.email)
-                          if (resetData.error) {
-                            return toast.error(resetData.error)
+                          const { error } = await passwordResetLink(member.id,member.email)
+                          if (error) {
+                            return toast.error(error)
                           }
-                          
-                          console.log(resetData)
-
                           toast.success(`Password reset link has been sent to member: ${member.email}. Please check your email`)
-                          return { resetLink: resetData.ticket };
+                         
                         }}
                       >
                         <LockIcon className="mr-1 size-4" />

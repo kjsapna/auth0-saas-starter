@@ -80,3 +80,83 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Container for the pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+}
+
+/* Page number items */
+.pagination-page {
+  display: inline-block;
+}
+
+/* Page number links */
+.pagination-page-link {
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  color: #333;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* Active page number */
+.pagination-active .pagination-page-link {
+  background-color: #e5e7eb; /* Light gray background for active page */
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+/* Previous and Next buttons */
+.pagination-previous,
+.pagination-next {
+  display: inline-block;
+}
+
+/* Previous and Next links */
+.pagination-previous-link,
+.pagination-next-link {
+  padding: 4px 8px;
+  color: #333;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* Disabled Previous/Next (ReactPaginate adds a 'disabled' class automatically) */
+.pagination-previous.disabled .pagination-previous-link,
+.pagination-next.disabled .pagination-next-link {
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* Break (ellipsis) */
+.pagination-break {
+  display: inline-block;
+}
+
+.pagination-break-link {
+  padding: 4px 8px;
+  color: #333;
+  text-decoration: none;
+  cursor: default;
+}
+
+/* Page info (e.g., "Page 2 of 2") */
+.pagination-info {
+  font-size: 14px;
+  color: #333;
+}
+
+/* Hover effects */
+.pagination-page-link:hover,
+.pagination-previous-link:hover,
+.pagination-next-link:hover {
+  background-color: #f1f5f9; /* Light gray on hover */
+  border-radius: 4px;
+}

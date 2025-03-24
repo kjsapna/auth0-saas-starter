@@ -13,6 +13,11 @@ export async function updateDisplayName(formData: FormData) {
   }
 
   const displayName = formData.get("display_name")
+  const phoneNumber = formData.get("phone_number") as string
+  const givenName = formData.get("given_name") as string
+  const familyName = formData.get("family_name") as string
+  const nickname = formData.get("nickname") as string
+  const username = formData.get("username") as string
 
   if (!displayName || typeof displayName !== "string") {
     return {
@@ -27,7 +32,11 @@ export async function updateDisplayName(formData: FormData) {
       },
       {
         name: displayName,
-      
+        //phone_number: phoneNumber,
+        given_name: givenName,
+        family_name: familyName,
+        nickname: nickname,
+        //username: username,
       }
     )
 
@@ -37,6 +46,11 @@ export async function updateDisplayName(formData: FormData) {
       user: {
         ...session.user,
         name: displayName,
+        //phone_number: phoneNumber,
+        given_name: givenName,
+        family_name: familyName,
+        nickname: nickname,
+        //username: username,
       },
     })
     revalidatePath("/", "layout")
@@ -71,9 +85,9 @@ export async function deleteAccount() {
   }
 }
 
-export async function changePassword(userId:string, newPassword:string) {
+export async function changePassword(userId: string, newPassword: string) {
   try {
-    const session=await appClient.getSession();
+    const session = await appClient.getSession()
     await managementClient.users.update(
       {
         id: session?.user.sub,
@@ -83,11 +97,9 @@ export async function changePassword(userId:string, newPassword:string) {
       }
     )
 
-    return { success: true, message: "Password changed successfully." };
-    
-  } catch (error:any) {
-    console.error("Error changing password:", error);
-    return { success: false, error: error.message };
+    return { success: true, message: "Password changed successfully." }
+  } catch (error: any) {
+    console.error("Error changing password:", error)
+    return { success: false, error: error.message }
   }
 }
-
