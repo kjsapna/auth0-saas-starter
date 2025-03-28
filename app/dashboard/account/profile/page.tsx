@@ -11,12 +11,11 @@ interface UserProfile {
   family_name?: string
   nickname?: string
   username?: string
+  email? :string
 }
 export default appClient.withPageAuthRequired(
   async function Profile() {
     const session = await appClient.getSession()
-    //const sess = await onboardingClient.getSession()
-    // console.log(sess)
     const getUserProfile = (): UserProfile => {
       const user = session?.user
       if (!user) {
@@ -28,6 +27,7 @@ export default appClient.withPageAuthRequired(
         family_name: user.family_name || "",
         nickname: user.nickname || "",
         username: user.username || "",
+        email: user.email || "",
       }
     }
 

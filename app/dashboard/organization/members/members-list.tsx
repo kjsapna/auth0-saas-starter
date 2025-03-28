@@ -36,8 +36,9 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-import { blockMember, removeMember, updateRole,passwordResetLink } from "./actions"
+import { blockMember, removeMember, updateRole,passwordResetLink,addGrouptoUser } from "./actions"
 import { BanIcon, BotIcon, LockIcon } from "lucide-react"
+import { MultiSelect } from "@/components/ui/multi-select"
 
 interface Props {
   members: {
@@ -46,13 +47,15 @@ interface Props {
     email: string
     picture: string
     role: Role,
-    blocked:boolean
+    blocked:boolean,
+    groups: string[]
   }[]
+  availableGroups: string[]
 }
 
-export function MembersList({ members }: Props) {
+export function MembersList({ members,availableGroups=[]}: Props) {
 
-  
+  console.log(members);
 
   return (
     <Card>
@@ -66,7 +69,7 @@ export function MembersList({ members }: Props) {
             <TableRow>
               <TableHead>User</TableHead>
               <TableHead>Role</TableHead>
-              <TableHead></TableHead>
+              <TableHead>AD Group</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -112,6 +115,27 @@ export function MembersList({ members }: Props) {
                       </SelectGroup>
                     </SelectContent>
                   </Select>
+                </TableCell>
+                <TableCell>
+                  <MultiSelect
+                    options={(availableGroups || []).map((group) => ({
+                      value: group,
+                      label: group,
+                    }))}
+                    defaultValue={member.groups || []}
+                    onValueChange={async (selectedGroups) => {
+                      const { error } = await addGrouptoUser(
+                        member.id,
+                        selectedGroups
+                      )
+                      if (error) {
+                        return toast.error(error)
+                      }
+                      toast.success("Member's groups have been updated.")
+                    }}
+                    placeholder="Select groups"
+                    className="w-[200px]"
+                  />
                 </TableCell>
                 <TableCell className="flex justify-end">
                   <DropdownMenu>

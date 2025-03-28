@@ -1,7 +1,7 @@
 "use client"
 
 import { toast } from "sonner"
-
+import { z } from "zod";
 import {
   Card,
   CardContent,
@@ -22,19 +22,21 @@ interface UserProfile {
   family_name?: string
   nickname?: string
   username?: string
+  email?:string
 }
 interface Props {
   displayName: string
   userProfile?: UserProfile
 }
 
+
+
 export function DisplayNameForm({ displayName, userProfile }: Props) {
-  console.log(userProfile)
   return (
     <Card>
       <form
         action={async (formData: FormData) => {
-          const { error } = await updateDisplayName(formData)
+          const {error} = await updateDisplayName(formData)
 
           if (error) {
             toast.error(error)
@@ -44,14 +46,14 @@ export function DisplayNameForm({ displayName, userProfile }: Props) {
         }}
       >
         <CardHeader>
-          <CardTitle>Display Name</CardTitle>
+          <CardTitle>User Profile</CardTitle>
           <CardDescription>
-            Enter a name you would liked to have displayed to other users.
+           
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="grid w-full max-w-sm items-center gap-1.5">
-            <Label htmlFor="display_name" className="sr-only">
+            <Label htmlFor="display_name">
               Display Name
             </Label>
             <Input
@@ -60,6 +62,15 @@ export function DisplayNameForm({ displayName, userProfile }: Props) {
               type="text"
               placeholder="John Smith"
               defaultValue={displayName}
+            />
+          </div>
+          <div className="grid w-full max-w-sm items-center gap-1.5">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              name="email"
+              type="text"
+              defaultValue={userProfile?.email || ""}
             />
           </div>
           <div className="grid w-full max-w-sm items-center gap-1.5">
@@ -98,7 +109,7 @@ export function DisplayNameForm({ displayName, userProfile }: Props) {
               id="phone_number"
               name="phone_number"
               type="tel"
-              placeholder="+1 (555) 123-4567"
+              placeholder="+15551234567"
               defaultValue={userProfile?.phone_number || ""}
             />
           </div>

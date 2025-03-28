@@ -141,7 +141,7 @@ const UserLogs = () => {
                     <TableRow key={member.id}>
                       <TableCell>{member.name || "N/A"}</TableCell>
                       <TableCell>{member.email || "N/A"}</TableCell>
-                      <TableCell>{member.last_login || "Never"}</TableCell>
+                      <TableCell>{member.last_login && member.last_login.includes("T")? member.last_login.split("T")[0]: "Never"}</TableCell>
                       <TableCell>
                         {member?.blocked ? "Blocked" : "Active"}
                       </TableCell>

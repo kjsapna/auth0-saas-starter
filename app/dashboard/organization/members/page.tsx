@@ -10,16 +10,31 @@ export default async function Members() {
   const session = await appClient.getSession()
   const { data: members } = await managementClient.organizations.getMembers({
     id: session!.user.org_id,
-    fields: ["user_id", "name", "email", "picture", "roles"].join(","),
+    fields: ["user_id", "name", "email", "picture", "roles",].join(","),
     include_fields: true,
   })
+
+  const { data: organization } = await managementClient.organizations.get({
+    id: session!.user.org_id,
+  });
+
+  console.log(organization);
+
 
   const membersWithStatus = await Promise.all(
     members.map(async (member) => {
       const user = await managementClient.users.get({ id: member.user_id });
-      return { ...member, blocked: user.data.blocked ?? false };
+      
+      return { ...member, 
+        blocked: user.data.blocked ?? false,
+        groups: user.data.user_metadata?.group || []
+       };
     })
   );
+  const availableGroups = Array.isArray(organization.metadata?.group?.split(',')) 
+  ? organization.metadata?.group?.split(',') 
+  : [];
+  console.log(availableGroups);
 
   const { data: invitations } =
     await managementClient.organizations.getInvitations({
@@ -40,8 +55,11 @@ export default async function Members() {
           email: m.email,
           picture: m.picture,
           role: ((m.roles && m.roles[0]?.name) || "member") as Role,
-          blocked:m.blocked
+          blocked:m.blocked,
+          groups: m.groups 
         }))}
+        availableGroups={availableGroups}
+      
       />
 
       <InvitationsList

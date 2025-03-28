@@ -18,6 +18,8 @@ export async function updateDisplayName(formData: FormData) {
   const familyName = formData.get("family_name") as string
   const nickname = formData.get("nickname") as string
   const username = formData.get("username") as string
+  const email = formData.get("email") as string
+
 
   if (!displayName || typeof displayName !== "string") {
     return {
@@ -26,17 +28,27 @@ export async function updateDisplayName(formData: FormData) {
   }
 
   try {
+    if(username){
+      await managementClient.users.update(
+        {
+          id: session.user.sub,
+        },
+        {
+         username:username
+        }
+      )
+    }
     await managementClient.users.update(
-      {
+      { 
         id: session.user.sub,
       },
       {
         name: displayName,
-        //phone_number: phoneNumber,
+        phone_number: phoneNumber,
         given_name: givenName,
         family_name: familyName,
         nickname: nickname,
-        //username: username,
+        email: email,
       }
     )
 
@@ -46,18 +58,19 @@ export async function updateDisplayName(formData: FormData) {
       user: {
         ...session.user,
         name: displayName,
-        //phone_number: phoneNumber,
+        phone_number: phoneNumber,
         given_name: givenName,
         family_name: familyName,
         nickname: nickname,
-        //username: username,
+        email:email,
+        username: username,
       },
     })
     revalidatePath("/", "layout")
   } catch (error) {
     console.error("failed to update display name", error)
     return {
-      error: "Failed to update your display name.",
+      error: "Failed to update account.",
     }
   }
 

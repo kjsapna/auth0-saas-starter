@@ -221,6 +221,7 @@ export const updateRole = withServerActionAuth(
     role: "admin",
   }
 )
+
 export const passwordResetLink = withServerActionAuth(
   async function passwordResetLink(userId: string,email:string,session:Session) {
     try {
@@ -256,3 +257,22 @@ export const passwordResetLink = withServerActionAuth(
     role: "admin",
   }
 )
+
+export const addGrouptoUser = withServerActionAuth(
+async function addGrouptoUser(userId: string, group: string[],session: Session) {
+
+  try {
+    await managementClient.users.update(
+      { id: userId },
+      { user_metadata: { group } }
+    );
+    return { error: null };
+  } catch (error) {
+    return { error: "Cannot assign group to the user"};
+  }
+},
+{
+  role: "admin",
+}
+)
+
