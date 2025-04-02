@@ -17,9 +17,7 @@ export default async function Logs() {
         description="List of user logs "
       />
          <UserLogs
-              
-              
-            />
+          />
       
     </div>
   )

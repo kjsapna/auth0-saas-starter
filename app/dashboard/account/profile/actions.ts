@@ -44,11 +44,15 @@ export async function updateDisplayName(formData: FormData) {
       },
       {
         name: displayName,
-        phone_number: phoneNumber,
+        //phone_number: phoneNumber,
         given_name: givenName,
         family_name: familyName,
         nickname: nickname,
         email: email,
+        user_metadata: {
+        phone_number: phoneNumber
+        
+        }
       }
     )
 

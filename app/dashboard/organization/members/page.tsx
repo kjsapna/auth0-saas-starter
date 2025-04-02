@@ -18,8 +18,7 @@ export default async function Members() {
     id: session!.user.org_id,
   });
 
-  console.log(organization);
-
+  const { data:roles } = await managementClient.roles.getAll();
 
   const membersWithStatus = await Promise.all(
     members.map(async (member) => {
@@ -34,7 +33,7 @@ export default async function Members() {
   const availableGroups = Array.isArray(organization.metadata?.group?.split(',')) 
   ? organization.metadata?.group?.split(',') 
   : [];
-  console.log(availableGroups);
+
 
   const { data: invitations } =
     await managementClient.organizations.getInvitations({
@@ -58,7 +57,9 @@ export default async function Members() {
           blocked:m.blocked,
           groups: m.groups 
         }))}
+        roles={roles}
         availableGroups={availableGroups}
+        
       
       />
 

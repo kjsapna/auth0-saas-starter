@@ -113,7 +113,7 @@ export function OrganizationSwitcher({
             </CommandGroup>
           </CommandList>
           <CommandSeparator />
-          <CommandList>
+          {/* <CommandList>
             <CommandGroup>
               <CommandItem
                 onSelect={() => {
@@ -126,7 +126,7 @@ export function OrganizationSwitcher({
                 Create Organization
               </CommandItem>
             </CommandGroup>
-          </CommandList>
+          </CommandList> */}
         </Command>
       </PopoverContent>
     </Popover>

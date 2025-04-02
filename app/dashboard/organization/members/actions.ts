@@ -155,6 +155,7 @@ export const blockMember = withServerActionAuth(
 )
 
 export const updateRole = withServerActionAuth(
+ // async function updateRole(userId: string, selectedRole:{name: string, id: string, description: string}, session: Session) {
   async function updateRole(userId: string, role: Role, session: Session) {
     if (userId === session.user.sub) {
       return {
@@ -171,8 +172,9 @@ export const updateRole = withServerActionAuth(
         error: "Role is required and must be either 'member' or 'admin'.",
       }
     }
-
     const roleId = roles[role]
+
+    //const roleId = selectedRole.id;
 
     try {
       const { data: currentRoles } =
@@ -222,36 +224,67 @@ export const updateRole = withServerActionAuth(
   }
 )
 
+const sendPasswordResetLink = async (email: string) => {
+  const response = await fetch(
+    `https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}/dbconnections/change_password`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        client_id: process.env.AUTH0_CLIENT_ID,
+        email,
+        connection: process.env.DEFAULT_CONNECTION,
+        organization_id: process.env.DEFAULT_CONNECTION_ID,
+      }),
+    }
+  )
+  return response.json()
+}
 export const passwordResetLink = withServerActionAuth(
-  async function passwordResetLink(userId: string,email:string,session:Session) {
+  async function passwordResetLink(
+    userId: string,
+    email: string,
+    session: Session
+  ) {
     try {
-     
-      const response = await fetch(`https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}/dbconnections/change_password`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
-        body: JSON.stringify({
-          client_id: process.env.AUTH0_CLIENT_ID,
-          email,
-          connection: process.env.DEFAULT_CONNECTION,
-          organization_id: process.env.DEFAULT_CONNECTION_ID
-        })
-      });
-        revalidatePath("/dashboard/organization/members")
-      
-        console.log("If the email exists, a reset link has been sent.");
-      
-      
+      await sendPasswordResetLink(email)
+      revalidatePath("/dashboard/organization/members")
+      console.log("If the email exists, a reset link has been sent.")
     } catch (error) {
       console.error("failed to sent reset password link", error)
       return {
         error: "Failed  to sent reset password link.",
       }
     }
-    
     return {}
+  },
+  {
+    role: "admin",
+  }
+)
+export const bulkPasswordResetLink = withServerActionAuth(
+  async function bulkPasswordResetLink(emails: string[], session: Session) {
+    try {
+      const batchSize = 10;
+      const results = []
+      for (let i = 0; i < emails.length; i += batchSize) {
+        const batch = emails.slice(i, i + batchSize)
+        console.log(`Processing batch: ${i / batchSize + 1}`)
+        const batchResults = await Promise.allSettled(
+          batch.map((email) => sendPasswordResetLink(email)) // Wrap email in an array for API
+        )
+        results.push(...batchResults)
+      }
+      return {}
+    } catch (error) {
+      console.error("failed to sent reset password link", error)
+      return {
+        error: "Failed  to sent reset password link.",
+      }
+    }
   },
   {
     role: "admin",

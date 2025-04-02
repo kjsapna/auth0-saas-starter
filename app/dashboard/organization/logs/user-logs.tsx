@@ -23,6 +23,7 @@ interface User {
   email: string
   last_login: string
   blocked: string
+  last_password_reset:string
 }
 
 const UserLogs = () => {
@@ -52,7 +53,9 @@ const UserLogs = () => {
           email: m.email,
           last_login: m.last_login,
           blocked: m?.blocked,
+          last_password_reset:m?.last_password_reset || m?.created_at
         }))
+        console.log(users);
         setMembers(users)
         // Update pagination based on total items and items per page
         setPageCount(Math.ceil(users.length / itemsPerPage))
@@ -133,6 +136,7 @@ const UserLogs = () => {
                   <TableHead>Email</TableHead>
                   <TableHead>Last Login</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Last Password Reset </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -145,6 +149,7 @@ const UserLogs = () => {
                       <TableCell>
                         {member?.blocked ? "Blocked" : "Active"}
                       </TableCell>
+                      <TableCell>{member.last_password_reset.split("T")[0]}</TableCell>
                     </TableRow>
                   ))
                 ) : (

@@ -41,7 +41,7 @@ export function DisplayNameForm({ displayName, userProfile }: Props) {
           if (error) {
             toast.error(error)
           } else {
-            toast.success("Your display name has been updated.")
+            toast.success("Your profile  has been updated.")
           }
         }}
       >
