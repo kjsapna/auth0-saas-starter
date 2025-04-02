@@ -43,6 +43,7 @@ import { MultiSelect } from "@/components/ui/multi-select"
 import { useEffect, useRef, useState } from "react"
 import { SubmitButton } from "@/components/submit-button"
 import { Input } from "@/components/ui/input"
+import ReactPaginate from "react-paginate"
 
 interface Props {
   members: {
@@ -54,20 +55,23 @@ interface Props {
     blocked: boolean,
     groups: string[]
   }[]
-  roles: { name: string, id: string, description: string }[]
+  // roles: { name: string, id: string, description: string }[]
   availableGroups: string[]
 }
 
-export function MembersList({ members, roles, availableGroups = [] }: Props) {
+export function MembersList({ members,  availableGroups = [] }: Props) {
 
 
   const ref = useRef<HTMLFormElement>(null)
   const [memberPasswordResetList, setMemberPasswordResetList] = useState<
     string[]
   >([])
-  const [roleList, setRoleList] = useState<
-    string[]
-  >([])
+  const [search, setSearch] = useState<string>("")
+  const [memberList, setMemberList] = useState(members)
+  const [page, setPage] = useState<number>(0) // Current page (zero-based)
+  const [pageCount, setPageCount] = useState<number>(0) // Total pages
+  const [itemOffset, setItemOffset] = useState<number>(0) // Offset for pagination
+  const itemsPerPage = 5 // Fixed items per page
 
   const updateMemberPasswordResetList = (checked: boolean, email: string) => {
     setMemberPasswordResetList((prev) => {
@@ -91,22 +95,70 @@ export function MembersList({ members, roles, availableGroups = [] }: Props) {
     })
   }
 
+  const fetchMemberList = () => {
+    let memberList = members;
+    if (search !== "") {
+      memberList = members.filter((m) => m.name.toLowerCase().includes(search))
+    }
+
+    setPageCount(Math.ceil(memberList.length / itemsPerPage))
+    // Slice the data for the current page
+    const endOffset = itemOffset + itemsPerPage
+    setMemberList(memberList.slice(itemOffset, endOffset))
+  }
+
+  // Update displayed list when pagination changes
+  useEffect(() => {
+    if (members.length > 0) {
+      const endOffset = itemOffset + itemsPerPage
+      setMemberList(members.slice(itemOffset, endOffset))
+      setPageCount(Math.ceil(members.length / itemsPerPage))
+    }
+  }, [itemOffset, members])
+
+  // Handle search
+  const handleSearch = () => {
+    setPage(0) // Reset to first page
+    setItemOffset(0) // Reset offset
+    fetchMemberList()
+  }
+
+  // Handle page click from ReactPaginate
+  const handlePageClick = (event: { selected: number }) => {
+    const newOffset = event.selected * itemsPerPage
+    setItemOffset(newOffset)
+    setPage(event.selected)
+  }
 
   return (
     <Card>
-      <form ref={ref} action={async (formData: FormData) => {
+     
+        <CardHeader>
+          <CardTitle>Current Members</CardTitle>
+          <CardDescription>The current organization members.</CardDescription>
+          <div className="flex gap-2">
+            <Input
+              type="text"
+              placeholder="Search by name or email..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              className="mt-2"
+            />
+            <Button onClick={handleSearch} className="mt-2">
+              Search
+            </Button>
+          </div>
+        </CardHeader>
+         <form ref={ref} action={async (formData: FormData) => {
         const { error } = await bulkPasswordResetLink(memberPasswordResetList)
         if (error) {
           toast.error(error)
         } else {
-          toast.success(`Invitation sent to ${formData.get("email")}`)
+          toast.success(`Invitation sent to All Selected Users`)
           ref.current?.reset()
         }
       }}>
-        <CardHeader>
-          <CardTitle>Current Members</CardTitle>
-          <CardDescription>The current organization members.</CardDescription>
-        </CardHeader>
         <CardContent>
           {memberPasswordResetList.length > 0 && <CardFooter className="flex justify-end">
             <SubmitButton>Send Password Reset Email</SubmitButton>
@@ -129,7 +181,7 @@ export function MembersList({ members, roles, availableGroups = [] }: Props) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {members.map((member) => (
+              {memberList.map((member) => (
                 <TableRow key={member.id}>
                   <TableCell className="pr-0">
                     <Input
@@ -179,7 +231,7 @@ export function MembersList({ members, roles, availableGroups = [] }: Props) {
                         if (error) {
                           return toast.error(error)
                         }
-                     
+
 
                         toast.success("The member's role has been updated.")
                       }}
@@ -192,8 +244,8 @@ export function MembersList({ members, roles, availableGroups = [] }: Props) {
                           {/* {roles.map((role: { name: string }) => (<SelectItem value={role.name}>{role.name}</SelectItem>)
                     
                           )} */}
-                            <SelectItem value="admin">Admin</SelectItem>
-                            <SelectItem value="member">Member</SelectItem>
+                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="member">Member</SelectItem>
 
                         </SelectGroup>
                       </SelectContent>
@@ -280,6 +332,33 @@ export function MembersList({ members, roles, availableGroups = [] }: Props) {
               ))}
             </TableBody>
           </Table>
+          <div className="mt-4 flex items-center justify-between">
+            {pageCount > 1 && (
+              <ReactPaginate
+                previousLabel={"Previous"}
+                nextLabel={"Next"}
+                breakLabel={"..."}
+                pageCount={pageCount}
+                marginPagesDisplayed={1}
+                pageRangeDisplayed={2}
+                onPageChange={handlePageClick}
+                forcePage={page} // Sync with current page
+                breakClassName={"pagination-break"}
+                breakLinkClassName={"pagination-break-link"}
+                containerClassName={"pagination"}
+                pageClassName={"pagination-page"}
+                pageLinkClassName={"pagination-page-link"}
+                previousClassName={"pagination-previous"}
+                previousLinkClassName={"pagination-previous-link"}
+                nextClassName={"pagination-next"}
+                nextLinkClassName={"pagination-next-link"}
+                activeClassName={"pagination-active"}
+              />
+            )}
+            <span className="pagination-info">
+              Page {page + 1} of {Math.max(pageCount, 1)}
+            </span>
+          </div>
         </CardContent>
       </form>
     </Card>
