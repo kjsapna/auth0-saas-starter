@@ -6,23 +6,28 @@ import { DeleteAccountForm } from "./delete-account-form"
 import { DisplayNameForm } from "./display-name-form"
 
 interface UserProfile {
-  phone_number?: string
+
   given_name?: string
   family_name?: string
   nickname?: string
   username?: string
-  email? :string
+  email?: string
+  phone_number?: string
+
 }
 export default appClient.withPageAuthRequired(
   async function Profile() {
     const session = await appClient.getSession()
     const getUserProfile = (): UserProfile => {
-      const user = session?.user
+      const user = session?.user;
       if (!user) {
         return {}
       }
+
+      const user_metadata = session.user[process.env.CUSTOM_CLAIMS_NAMESPACE + 'user_metadata'];
+
       return {
-        phone_number: user.phone_number || "",
+        phone_number: user_metadata?.phone_number || "",
         given_name: user.given_name || "",
         family_name: user.family_name || "",
         nickname: user.nickname || "",
