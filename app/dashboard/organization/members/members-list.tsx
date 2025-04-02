@@ -285,7 +285,7 @@ export function MembersList({ members,  availableGroups = [] }: Props) {
                           onSelect={async () => {
                             const { error } = await passwordResetLink(member.id, member.email)
                             if (error) {
-                              return toast.error(error)
+                              //return toast.error(error)
                             }
                             toast.success(`Password reset link has been sent to member: ${member.email}. Please check your email`)
 
