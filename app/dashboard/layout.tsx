@@ -81,14 +81,14 @@ export default async function DashboardLayout({
                 <Link href="/">Home</Link>
               </Button>
 
-              <Button variant="link" asChild>
+              {/* <Button variant="link" asChild>
                 <Link
                   href="https://github.com/auth0-developer-hub/auth0-b2b-saas-starter"
                   target="_blank"
                 >
                   Source
                 </Link>
-              </Button>
+              </Button> */}
             </div>
           </div>
 
