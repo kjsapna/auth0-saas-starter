@@ -1,11 +1,13 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { Session } from "@auth0/nextjs-auth0"
-
 import { managementClient } from "@/lib/auth0"
-import { DEFAULT_MFA_POLICY, SUPPORTED_PROVIDERS } from "@/lib/mfa-policy"
 import { withServerActionAuth } from "@/lib/with-server-action-auth"
+import { Session } from "@auth0/nextjs-auth0"
+import { PATHS, ADMIN_ROLES } from "@/lib/constants"
+import {DEFAULT_MFA_POLICY, SUPPORTED_PROVIDERS } from "@/lib/mfa-policy"
+import { handleError } from "@/lib/utils"
+
 
 export const updateMfaPolicy = withServerActionAuth(
   async function updateMfaPolicy(formData: FormData, session: Session) {
@@ -37,17 +39,15 @@ export const updateMfaPolicy = withServerActionAuth(
         }
       )
 
-      revalidatePath("/dashboard/organization/security-policies")
+      revalidatePath(PATHS.DASHBOARD.ORGANIZATION.SECURITY_POLICIES)
     } catch (error) {
-      console.error("failed to update the organization's MFA policy", error)
-      return {
-        error: "Failed to update the organization's MFA policy.",
-      }
+      return handleError("update the organization's MFA policy", error)
+      
     }
 
     return {}
   },
   {
-    role: "admin",
+    role: ADMIN_ROLES,
   }
 )

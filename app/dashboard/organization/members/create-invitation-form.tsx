@@ -1,8 +1,9 @@
 "use client"
 
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import { toast } from "sonner"
 
+import { SubmitButton } from "@/components/submit-button"
 import {
   Card,
   CardContent,
@@ -20,12 +21,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { SubmitButton } from "@/components/submit-button"
 
 import { createInvitation } from "./actions"
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export function CreateInvitationForm() {
-  const ref = useRef<HTMLFormElement>(null)
+const [email, setEmail] = useState('');
+const [emailError, setEmailError] = useState("");
+
+const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const value = e.target.value;
+  setEmail(value);
+  if (value && !emailRegex.test(value)) {
+    setEmailError("Please enter a valid email address");
+  } else {
+    setEmailError("");
+  }
+};
+ const ref = useRef<HTMLFormElement>(null)
 
   return (
     <Card>
@@ -58,7 +71,12 @@ export function CreateInvitationForm() {
                 id="email"
                 name="email"
                 placeholder="jane@example.com"
+                onChange={handleEmailChange}
+                className={emailError ? "border-red-500" : ""}
               />
+               {emailError && (
+                <p className="text-red-500 text-sm mt-1">{emailError}</p> 
+            )}
             </div>
 
             <div className="grid w-full items-center gap-1.5">

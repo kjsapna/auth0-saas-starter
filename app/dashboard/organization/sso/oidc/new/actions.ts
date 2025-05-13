@@ -1,13 +1,15 @@
 "use server"
 
-import crypto from "crypto"
-import { revalidatePath } from "next/cache"
 import { Session } from "@auth0/nextjs-auth0"
 import slugify from "@sindresorhus/slugify"
+import crypto from "crypto"
+import { revalidatePath } from "next/cache"
 
 import { managementClient } from "@/lib/auth0"
 import { verifyDnsRecords } from "@/lib/domain-verification"
 import { withServerActionAuth } from "@/lib/with-server-action-auth"
+import { PATHS, ADMIN_ROLES } from "@/lib/constants"
+import { config } from "@/config"
 
 export const createConnection = withServerActionAuth(
   async function createConnection(formData: FormData, session: Session) {
@@ -82,7 +84,7 @@ export const createConnection = withServerActionAuth(
         // unique and we want to avoid collisions when supplied by the user
         name: `${slugify(displayName)}-${crypto.randomBytes(4).toString("hex")}`,
         strategy: "oidc",
-        enabled_clients: [process.env.AUTH0_CLIENT_ID],
+        enabled_clients: [config.auth0.clientId],
         options: {
           type,
           discovery_url: discoveryUrl,
@@ -102,7 +104,7 @@ export const createConnection = withServerActionAuth(
         }
       )
 
-      revalidatePath("/dashboard/organization/sso")
+      revalidatePath(PATHS.DASHBOARD.ORGANIZATION.SSO) 
     } catch (error) {
       console.error("failed to create the SSO connection", error)
       return {
@@ -113,7 +115,7 @@ export const createConnection = withServerActionAuth(
     return {}
   },
   {
-    role: "admin",
+    role: ADMIN_ROLES,
   }
 )
 
@@ -143,7 +145,7 @@ export const deleteConnection = withServerActionAuth(
         id: connectionId,
       })
 
-      revalidatePath("/dashboard/organization/sso")
+      revalidatePath(PATHS.DASHBOARD.ORGANIZATION.SSO)
 
       return {}
     } catch (error) {
@@ -154,6 +156,6 @@ export const deleteConnection = withServerActionAuth(
     }
   },
   {
-    role: "admin",
+    role: ADMIN_ROLES,
   }
 )

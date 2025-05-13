@@ -1,12 +1,12 @@
-import { appClient, managementClient } from "@/lib/auth0"
+import { auth0Client, managementClient } from "@/lib/auth0"
 import { SUPPORTED_PROVIDERS } from "@/lib/mfa-policy"
 import { PageHeader } from "@/components/page-header"
 
 import { MFAEnrollmentForm } from "./mfa-enrollment-form"
 
-export default appClient.withPageAuthRequired(
+export default auth0Client.withPageAuthRequired(
   async function Profile() {
-    const session = await appClient.getSession()
+    const session = await auth0Client.getSession()
     const userId = session?.user.sub
     const { data: factors } = await managementClient.guardian.getFactors()
     const response = await managementClient.users.getAuthenticationMethods({

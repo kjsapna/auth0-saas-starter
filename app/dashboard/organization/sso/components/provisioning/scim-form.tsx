@@ -63,6 +63,7 @@ import {
   deleteScimToken,
   updateScimConfig,
 } from "./actions"
+import { config } from "@/config"
 
 interface Props {
   scimConfig: {
@@ -80,7 +81,7 @@ export function ScimForm({ scimConfig, scimTokens }: Props) {
   const [showTokenDialog, setShowTokenDialog] = useState(false)
   const [token, setToken] = useState("")
   const { connectionId } = useParams<{ connectionId: string }>()
-  const SCIM_ENDPOINT_URL = `https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}/scim/v2/connections/${connectionId}/`
+  const SCIM_ENDPOINT_URL = `https://${config.next.publicUrl}/scim/v2/connections/${connectionId}/`
 
   return (
     <>

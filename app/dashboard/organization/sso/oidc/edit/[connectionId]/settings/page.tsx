@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 
-import { appClient, managementClient } from "@/lib/auth0"
+import { auth0Client, managementClient } from "@/lib/auth0"
 import { getOrCreateDomainVerificationToken } from "@/lib/domain-verification"
 
 import { UpdateOidcConnectionForm } from "./update-oidc-connection-form"
@@ -10,7 +10,7 @@ export default async function UpdateOidcConnection({
 }: {
   params: { connectionId: string }
 }) {
-  const session = await appClient.getSession()
+  const session = await auth0Client.getSession()
 
   if (!session) {
     return redirect("/api/auth/login")

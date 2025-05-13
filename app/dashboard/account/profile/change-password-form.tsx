@@ -1,26 +1,23 @@
 "use client"
 
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-import { useState } from "react"
-import { redirect } from "next/navigation"
-
+import { SubmitButton } from "@/components/submit-button"
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardDescription,
-  CardFooter,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/card"
-import { SubmitButton } from "@/components/submit-button"
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { redirect } from "next/navigation"
+import { useState } from "react"
+import { toast } from "sonner"
 import { changePassword } from "./actions"
+
 interface Props {
-    userId: string
+   readonly userId: string
   }
 export function ChangePasswordForm({userId}:Props) {
-    const router = useRouter();
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [isOpen, setIsOpen] = useState(false);
@@ -47,7 +44,7 @@ export function ChangePasswordForm({userId}:Props) {
       }
     };
 
-    const handleConfirmPasswordChange = (e:any) => {
+    const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setConfirmPassword(e.target.value);
         if (password !== e.target.value) {
           setPasswordError("Passwords do not match");
@@ -75,7 +72,7 @@ export function ChangePasswordForm({userId}:Props) {
                 <h2 className="text-lg font-bold">Change Password</h2>
                 <p className="text-sm text-gray-600">Update your new password.</p>
                 <div>
-                  <label className="block text-sm font-medium">Password</label>
+                  <label htmlFor="password"className="block text-sm font-medium">Password</label>
                   <input
                     type="password"
                     value={password}
@@ -85,7 +82,7 @@ export function ChangePasswordForm({userId}:Props) {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium">Confirm Password</label>
+                  <label htmlFor="confirmpassword"className="block text-sm font-medium">Confirm Password</label>
                   <input
                     type="password"
                     value={confirmPassword}

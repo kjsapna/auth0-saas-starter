@@ -1,8 +1,8 @@
 // components/ui/multi-select.tsx
-import * as React from "react"
-import { Check, ChevronDown, ChevronUp } from "lucide-react"
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import { ChevronDown, ChevronUp } from "lucide-react"
+import * as React from "react"
 
 interface MultiSelectProps {
   options?: { value: string; label: string }[]
@@ -57,6 +57,7 @@ export function MultiSelect({
     <div className={cn("relative", className)} ref={dropdownRef}>
       {/* Toggle Button */}
       <Button
+        type="button"
         variant="outline"
         className="w-full justify-between"
         onClick={() => setOpen((prev) => !prev)}

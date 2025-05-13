@@ -1,34 +1,38 @@
-import Link from "next/link"
-import { redirect } from "next/navigation"
 import { UserProvider } from "@auth0/nextjs-auth0/client"
 import { SettingsIcon } from "lucide-react"
+import Link from "next/link"
+import { redirect } from "next/navigation"
 
-import { appClient, managementClient } from "@/lib/auth0"
-import { Button } from "@/components/ui/button"
 import { Auth0Logo } from "@/components/auth0-logo"
 import { ModeToggle } from "@/components/mode-toggle"
 import { OrganizationSwitcher } from "@/components/organization-switcher"
+import { Button } from "@/components/ui/button"
 import { UserNav } from "@/components/user-nav"
+import { auth0Client, managementClient } from "@/lib/auth0"
+import { getRole } from "@/lib/roles"
+import { PATHS, ROLES } from "@/lib/constants"
 
 export default async function DashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const session = await appClient.getSession()
+  const session = await auth0Client.getSession()
 
   // if the user is not authenticated, redirect to login
   if (!session?.user) {
-    redirect("/api/auth/login")
+    redirect(PATHS.AUTH.LOGIN)
   }
 
   const { data: orgs } = await managementClient.users.getUserOrganizations({
     id: session.user.sub,
   })
 
+  const isNGEAdmin = getRole(session.user) === ROLES.NGEADMIN;
+
   // if the user does not belong to any organizations, redirect to onboarding
   if (!orgs.length) {
-    redirect("/onboarding/create")
+    redirect(PATHS.ONBOARDING.CREATE)
   }
 
   return (
@@ -39,10 +43,11 @@ export default async function DashboardLayout({
             organizations={orgs.map((o) => ({
               id: o.id,
               slug: o.name,
-              displayName: o.display_name!,
+              displayName: o.display_name,
               logoUrl: o.branding?.logo_url,
             }))}
             currentOrgId={session.user.org_id}
+            isNGEAdmin={isNGEAdmin}
           />
 
           <Link
@@ -73,22 +78,13 @@ export default async function DashboardLayout({
             <Auth0Logo className="h-6 w-6" />
 
             <div className="font-mono font-semibold">
-              <Link href="/">SaaStart</Link>
+              <Link href="/">Delegated Admin Console</Link>
             </div>
 
             <div>
               <Button variant="link" asChild>
                 <Link href="/">Home</Link>
               </Button>
-
-              {/* <Button variant="link" asChild>
-                <Link
-                  href="https://github.com/auth0-developer-hub/auth0-b2b-saas-starter"
-                  target="_blank"
-                >
-                  Source
-                </Link>
-              </Button> */}
             </div>
           </div>
 

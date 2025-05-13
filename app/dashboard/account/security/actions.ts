@@ -3,21 +3,21 @@
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
-import { appClient, managementClient } from "@/lib/auth0"
+import { auth0Client, managementClient } from "@/lib/auth0"
+import { Result, error, handleError, success } from "@/lib/utils"
+import { PATHS } from "@/lib/constants"
 
-export async function createEnrollment(formData: FormData) {
-  const session = await appClient.getSession()
+export async function createEnrollment(formData: FormData): Promise<Result<{ ticketUrl: string }>> {
+  const session = await auth0Client.getSession()
 
   if (!session) {
-    return redirect("/api/auth/login")
+    return redirect(PATHS.AUTH.LOGIN)
   }
 
   let factorName = formData.get("factor_name")
 
   if (!factorName || typeof factorName !== "string") {
-    return {
-      error: "Factor name is required.",
-    }
+    return error<{ ticketUrl: string }>("Factor name is required.")
   }
 
   try {
@@ -35,32 +35,25 @@ export async function createEnrollment(formData: FormData) {
         allow_multiple_enrollments: true,
       })
 
-    revalidatePath("/dashboard/account/security", "layout")
+    revalidatePath(PATHS.DASHBOARD.ACCOUNT.SECURITY, "layout")
 
-    return {
-      ticketUrl: enrollmentTicket.ticket_url,
-    }
+    return success({ ticketUrl: enrollmentTicket.ticket_url })
   } catch (error) {
-    console.error("failed to create enrollment ticket", error)
-    return {
-      error: "Failed to create an enrollment ticket.",
-    }
+    return handleError<{ ticketUrl: string }>("create enrollment ticket", error)
   }
 }
 
-export async function deleteEnrollment(formData: FormData) {
-  const session = await appClient.getSession()
+export async function deleteEnrollment(formData: FormData): Promise<Result> {
+  const session = await auth0Client.getSession()
 
   if (!session) {
-    return redirect("/api/auth/login")
+    return redirect(PATHS.AUTH.LOGIN)
   }
 
   let enrollmentId = formData.get("enrollment_id")
 
   if (!enrollmentId || typeof enrollmentId !== "string") {
-    return {
-      error: "Enrollment ID is required.",
-    }
+    return error("Enrollment ID is required.")
   }
 
   try {
@@ -71,13 +64,13 @@ export async function deleteEnrollment(formData: FormData) {
       authentication_method_id: enrollmentId,
     })
 
-    revalidatePath("/dashboard/account/security", "layout")
+    revalidatePath(PATHS.DASHBOARD.ACCOUNT.SECURITY, "layout")
 
-    return {}
+    return success(undefined)
   } catch (error) {
-    console.error("failed to delete enrollment", error)
-    return {
-      error: "Failed to delete enrollment.",
-    }
+    return handleError("delete enrollment", error)
   }
 }
+
+
+

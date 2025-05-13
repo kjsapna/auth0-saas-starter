@@ -1,10 +1,10 @@
 import { Session } from "@auth0/nextjs-auth0"
 
-import { appClient } from "./auth0"
+import { auth0Client } from "./auth0"
 import { getRole, Role } from "./roles"
 
 interface Options {
-  role?: Role
+  role?: Role[]
 }
 
 /**
@@ -16,20 +16,19 @@ export function withServerActionAuth<T extends any[], U extends any>(
   options: Options
 ) {
   return async function (...args: T) {
-    const session = await appClient.getSession()
+    const session = await auth0Client.getSession()
 
     if (!session) {
       return {
         error: "You must be authenticated to perform this action.",
       }
     }
-
-    if (options.role && getRole(session.user) !== options.role) {
-      return {
-        error: `You must be a(n) ${options.role} to perform this action.`,
-      }
-    }
-
+    const userRoles = getRole(session.user);
+if (options.role && options.role.length > 0 && !options.role.some(role => userRoles.includes(role))) {
+  return {
+    error: `You must have one of the following roles: ${options.role.join(", ")}.`,
+  };
+}
     return serverActionWithSession(...args, session)
   }
 }

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { UserProvider } from "@auth0/nextjs-auth0/client"
 
 import { onboardingClient } from "@/lib/auth0"
+import { PATHS } from "@/lib/constants"
 
 export default async function CreateLayout({
   children,
@@ -11,7 +12,7 @@ export default async function CreateLayout({
   const session = await onboardingClient.getSession()
 
   if (!session) {
-    redirect("/onboarding/signup")
+    redirect(PATHS.ONBOARDING.SIGNUP)
   }
 
   // fetch the latest user data to ensure that the `email_verified` is not stale
@@ -26,7 +27,7 @@ export default async function CreateLayout({
 
   // user must verify their e-mail first to create your account
   if (!user.email_verified) {
-    redirect("/onboarding/verify")
+    redirect(PATHS.ONBOARDING.VERIFY)
   }
 
   return (

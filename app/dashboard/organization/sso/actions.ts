@@ -4,6 +4,7 @@ import { Session } from "@auth0/nextjs-auth0"
 
 import { verifyDnsRecords } from "@/lib/domain-verification"
 import { withServerActionAuth } from "@/lib/with-server-action-auth"
+import { ADMIN_ROLES } from "@/lib/constants"
 
 export const verifyDomain = withServerActionAuth(
   async function verifyDomain(domain: string, session: Session) {
@@ -25,6 +26,6 @@ export const verifyDomain = withServerActionAuth(
     }
   },
   {
-    role: "admin",
+    role: ADMIN_ROLES,
   }
 )

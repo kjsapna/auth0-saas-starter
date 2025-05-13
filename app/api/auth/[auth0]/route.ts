@@ -2,10 +2,10 @@ import { redirect } from "next/navigation"
 import { NextRequest } from "next/server"
 import { HandlerError } from "@auth0/nextjs-auth0"
 
-import { appClient } from "@/lib/auth0"
+import { auth0Client } from "@/lib/auth0"
 
-export const GET = appClient.handleAuth({
-  login: appClient.handleLogin((request) => {
+export const GET = auth0Client.handleAuth({
+  login: auth0Client.handleLogin((request) => {
     // NOTE: this is a typing issue. The request Object here is of type NextRequest (not NextApiRequest)
     // as this is a route handler.
     // See: https://nextjs.org/docs/app/building-your-application/routing/route-handlers#url-query-parameters
@@ -23,7 +23,7 @@ export const GET = appClient.handleAuth({
       returnTo: "/dashboard",
     }
   }),
-  signup: appClient.handleLogin({
+  signup: auth0Client.handleLogin({
     authorizationParams: {
       screen_hint: "signup",
     },

@@ -1,8 +1,6 @@
 "use client"
 
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-
+import { SubmitButton } from "@/components/submit-button"
 import {
   Card,
   CardDescription,
@@ -10,7 +8,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { SubmitButton } from "@/components/submit-button"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 import { deleteAccount } from "./actions"
 
@@ -21,10 +20,9 @@ export function DeleteAccountForm() {
     <Card>
       <form
         action={async () => {
-          const { error } = await deleteAccount()
-
-          if (error) {
-            toast.error(error)
+          const result = await deleteAccount()
+          if ('error' in result && result.error) {
+            toast.error(result.error.toString())
           } else {
             toast.success(
               "Your account has been deleted and you will be logged out."

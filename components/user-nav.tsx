@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 
-import { appClient } from "@/lib/auth0"
+import { auth0Client } from "@/lib/auth0"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 export async function UserNav() {
-  const session = await appClient.getSession()
+  const session = await auth0Client.getSession()
 
   return (
     <DropdownMenu>

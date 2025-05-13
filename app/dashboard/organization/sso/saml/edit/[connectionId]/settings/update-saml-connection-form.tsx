@@ -1,9 +1,11 @@
 "use client"
 
-import { useState } from "react"
 import { CopyIcon, InfoCircledIcon, TrashIcon } from "@radix-ui/react-icons"
+import { useState } from "react"
 import { toast } from "sonner"
 
+import { Code } from "@/components/code"
+import { SubmitButton } from "@/components/submit-button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import {
@@ -26,13 +28,12 @@ import {
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
-import { Code } from "@/components/code"
-import { SubmitButton } from "@/components/submit-button"
 
 import { AddDomainDialog } from "../../../../components/add-domain-dialog"
 import { updateConnection } from "./actions"
+import { config } from "@/config"
 
-const CALLBACK_URL = `https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}/login/callback`
+const CALLBACK_URL = `https://${config.next.publicUrl}/login/callback`
 
 export interface SamlConnection {
   id: string
@@ -209,7 +210,7 @@ export function UpdateSamlConnectionForm({
                 The request will be signed with <Code>RSA-SHA256</Code>.{" "}
                 <a
                   className="underline underline-offset-4"
-                  href={`https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}/pem?cert=connection`}
+                  href={`https://${config.next.publicUrl}/pem?cert=connection`}
                   target="_blank"
                 >
                   Download the certificate

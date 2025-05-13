@@ -1,14 +1,13 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
 import {
   CaretSortIcon,
   CheckIcon,
   PlusCircledIcon,
 } from "@radix-ui/react-icons"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 
-import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -25,6 +24,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
 
 type PopoverTriggerProps = React.ComponentPropsWithoutRef<typeof PopoverTrigger>
 
@@ -36,11 +36,13 @@ interface OrganizationSwitcherProps extends PopoverTriggerProps {
     logoUrl?: string
   }[]
   currentOrgId: string
+  isNGEAdmin:boolean
 }
 
 export function OrganizationSwitcher({
   organizations,
   currentOrgId,
+  isNGEAdmin
 }: OrganizationSwitcherProps) {
   const [open, setOpen] = useState(false)
   const router = useRouter()
@@ -62,15 +64,15 @@ export function OrganizationSwitcher({
         >
           <Avatar className="mr-2 size-8 rounded-sm">
             <AvatarImage
-              src={organization.logoUrl}
-              alt={organization.displayName}
+              src={organization?.logoUrl}
+              alt={organization?.displayName}
             />
             <AvatarFallback className="rounded-sm">
-              {organization.displayName[0].toUpperCase()}
+              {organization?.displayName[0].toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <span className="min-w-16 truncate text-left">
-            {organization.displayName}
+            {organization?.displayName}
           </span>
           <CaretSortIcon className="ml-auto h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -103,7 +105,7 @@ export function OrganizationSwitcher({
                   <CheckIcon
                     className={cn(
                       "ml-auto h-4 w-4",
-                      organization.slug === org.slug
+                      organization?.slug === org.slug
                         ? "opacity-100"
                         : "opacity-0"
                     )}
@@ -113,7 +115,7 @@ export function OrganizationSwitcher({
             </CommandGroup>
           </CommandList>
           <CommandSeparator />
-          {/* <CommandList>
+          {isNGEAdmin && <CommandList>
             <CommandGroup>
               <CommandItem
                 onSelect={() => {
@@ -126,7 +128,8 @@ export function OrganizationSwitcher({
                 Create Organization
               </CommandItem>
             </CommandGroup>
-          </CommandList> */}
+          </CommandList>}
+          
         </Command>
       </PopoverContent>
     </Popover>

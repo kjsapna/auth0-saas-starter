@@ -1,11 +1,13 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { CopyIcon, InfoCircledIcon, TrashIcon } from "@radix-ui/react-icons"
 import slugify from "@sindresorhus/slugify"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { toast } from "sonner"
 
+import { Code } from "@/components/code"
+import { SubmitButton } from "@/components/submit-button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import {
@@ -20,19 +22,19 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
-import { Code } from "@/components/code"
-import { SubmitButton } from "@/components/submit-button"
+
 
 import { AddDomainDialog } from "../../components/add-domain-dialog"
 import { createConnection } from "./actions"
 
-const CALLBACK_URL = `https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}/login/callback`
+
 
 interface Props {
   domainVerificationToken: string
+  CALLBACK_URL: string
 }
 
-export function CreateOidcConnectionForm({ domainVerificationToken }: Props) {
+export function CreateOidcConnectionForm({ domainVerificationToken,CALLBACK_URL }: Props) {
   const router = useRouter()
   const [name, setName] = useState("")
   const [type, setType] = useState("front_channel")

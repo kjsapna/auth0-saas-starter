@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import ReactPaginate from "react-paginate"
 
 import { Button } from "@/components/ui/button"
@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { useLoading } from "@/lib/loading-context"
 
 import { fetchUsers } from "./actions"
 
@@ -32,11 +33,11 @@ const UserLogs = () => {
   const [search, setSearch] = useState<string>("")
   const [page, setPage] = useState<number>(0) // Current page (zero-based)
   const [pageCount, setPageCount] = useState<number>(0) // Total pages
-  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [itemOffset, setItemOffset] = useState<number>(0) // Offset for pagination
   const itemsPerPage = 5 // Fixed items per page
+  const { setIsLoading } = useLoading()
 
-  const fetchUserData = async (query: string) => {
+  const fetchUserData = useCallback(async (query: string) => {
     setIsLoading(true)
     try {
       const queryParams = {
@@ -53,9 +54,9 @@ const UserLogs = () => {
           email: m.email,
           last_login: m.last_login,
           blocked: m?.blocked,
-          last_password_reset:m?.last_password_reset || m?.created_at
+          last_password_reset:m?.last_password_reset ?? m?.created_at
         }))
-        console.log(users);
+       
         setMembers(users)
         // Update pagination based on total items and items per page
         setPageCount(Math.ceil(users.length / itemsPerPage))
@@ -76,7 +77,7 @@ const UserLogs = () => {
     } finally {
       setIsLoading(false)
     }
-  }
+  },[itemsPerPage, itemOffset, setIsLoading])
 
   // Update displayed list when pagination changes
   useEffect(() => {
@@ -90,7 +91,7 @@ const UserLogs = () => {
   // Fetch data when search changes
   useEffect(() => {
     fetchUserData(search)
-  }, [search])
+  }, [search, fetchUserData])
 
   // Handle search
   const handleSearch = () => {
@@ -125,72 +126,56 @@ const UserLogs = () => {
         </div>
       </CardHeader>
       <CardContent>
-        {isLoading ? (
-          <div className="py-4 text-center">Loading...</div>
-        ) : (
-          <>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Last Login</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Last Password Reset </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {displayList.length > 0 ? (
-                  displayList.map((member) => (
-                    <TableRow key={member.id}>
-                      <TableCell>{member.name || "N/A"}</TableCell>
-                      <TableCell>{member.email || "N/A"}</TableCell>
-                      <TableCell>{member.last_login && member.last_login.includes("T")? member.last_login.split("T")[0]: "Never"}</TableCell>
-                      <TableCell>
-                        {member?.blocked ? "Blocked" : "Active"}
-                      </TableCell>
-                      <TableCell>{member.last_password_reset.split("T")[0]}</TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center">
-                      No users found
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Last Login</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Last Password Reset </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {displayList.map((member) => (
+              <TableRow key={member.id}>
+                <TableCell>{member.name}</TableCell>
+                <TableCell>{member.email}</TableCell>
+                <TableCell>{member.last_login.split("T")[0]}</TableCell>
+                <TableCell>{member.blocked ? "Blocked" : "Active"}</TableCell>
+                <TableCell>{member.last_password_reset.split("T")[0]}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
 
-            <div className="mt-4 flex items-center justify-between">
-              {pageCount > 1 && (
-                <ReactPaginate
-                  previousLabel={"Previous"}
-                  nextLabel={"Next"}
-                  breakLabel={"..."}
-                  pageCount={pageCount}
-                  marginPagesDisplayed={1}
-                  pageRangeDisplayed={2}
-                  onPageChange={handlePageClick}
-                  forcePage={page} // Sync with current page
-                  breakClassName={"pagination-break"}
-                  breakLinkClassName={"pagination-break-link"}
-                  containerClassName={"pagination"}
-                  pageClassName={"pagination-page"}
-                  pageLinkClassName={"pagination-page-link"}
-                  previousClassName={"pagination-previous"}
-                  previousLinkClassName={"pagination-previous-link"}
-                  nextClassName={"pagination-next"}
-                  nextLinkClassName={"pagination-next-link"}
-                  activeClassName={"pagination-active"}
-                />
-              )}
-              <span className="pagination-info">
-                Page {page + 1} of {Math.max(pageCount, 1)}
-              </span>
-            </div>
-          </>
-        )}
+        <div className="mt-4 flex items-center justify-between">
+          {pageCount > 1 && (
+            <ReactPaginate
+              previousLabel={"Previous"}
+              nextLabel={"Next"}
+              breakLabel={"..."}
+              pageCount={pageCount}
+              marginPagesDisplayed={1}
+              pageRangeDisplayed={2}
+              onPageChange={handlePageClick}
+              forcePage={page} // Sync with current page
+              breakClassName={"pagination-break"}
+              breakLinkClassName={"pagination-break-link"}
+              containerClassName={"pagination"}
+              pageClassName={"pagination-page"}
+              pageLinkClassName={"pagination-page-link"}
+              previousClassName={"pagination-previous"}
+              previousLinkClassName={"pagination-previous-link"}
+              nextClassName={"pagination-next"}
+              nextLinkClassName={"pagination-next-link"}
+              activeClassName={"pagination-active"}
+            />
+          )}
+          <span className="pagination-info">
+            Page {page + 1} of {Math.max(pageCount, 1)}
+          </span>
+        </div>
       </CardContent>
     </Card>
   )

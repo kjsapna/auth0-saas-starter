@@ -5,17 +5,17 @@ const sidebarNavItems = [
     title: "Profile",
     href: "/dashboard/account/profile",
   },
-  {
-    title: "Security",
-    href: "/dashboard/account/security",
-  },
+  // {
+  //   title: "Security",
+  //   href: "/dashboard/account/security",
+  // },
 ]
 
 interface AccountLayoutProps {
   children: React.ReactNode
 }
 
-export default async function AccountLayout({ children }: AccountLayoutProps) {
+export default async function AccountLayout({ children }: Readonly<AccountLayoutProps>) {
   return (
     <div className="space-y-1">
       <div className="flex min-h-full flex-col space-y-8 lg:flex-row lg:space-x-4 lg:space-y-0">

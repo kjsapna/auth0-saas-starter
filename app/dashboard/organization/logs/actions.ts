@@ -1,31 +1,41 @@
 "use server"
 
-import { Session } from "@auth0/nextjs-auth0"
 import { managementClient } from "@/lib/auth0"
 import { withServerActionAuth } from "@/lib/with-server-action-auth"
+import { Session } from "@auth0/nextjs-auth0"
+import { handleError, USERS_PER_PAGE, SEARCH_ENGINE } from "@/lib/utils"
+import { ADMIN_ROLES } from "@/lib/constants"
+
+interface QueryParams {
+  page?: number
+  query?: string
+}
 
 export const fetchUsers = withServerActionAuth(
-  async (queryParams: { page?: number; query?: string; }, session: Session) => {
+  async (queryParams: QueryParams, session: Session) => {
     try {
       const { page = 0, query = "" } = queryParams
-      let search = `organization_id:"${session?.user.org_id}"`;
-      if(query!=""){
-        search+=` AND (name:${query}* OR email:${query}*)`
-      }
+      
+      // Build search query
+      const searchQuery = [
+        `organization_id:"${session.user.org_id}"`,
+        query && `(name:${query}* OR email:${query}*)`
+      ]
+        .filter(Boolean)
+        .join(" AND ")
 
       const users = await managementClient.users.getAll({
-        q: search,
-        search_engine: "v3",
-        per_page: 10,
+        q: searchQuery,
+        search_engine: SEARCH_ENGINE,
+        per_page: USERS_PER_PAGE,
         page,
       })
-      const plainUsers = JSON.parse(JSON.stringify(users));
- 
-      return plainUsers;
+
+      // Deep clone users to ensure serialization
+      return JSON.parse(JSON.stringify(users))
     } catch (error) {
-      console.error("Error fetching users:", error)
-      return { error: "Failed to fetch users." }
+      return handleError("fetch users", error)
     }
   },
-  { role: "admin" }
+  { role: ADMIN_ROLES }
 )

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 
-import { appClient, managementClient } from "@/lib/auth0"
+import { auth0Client, managementClient } from "@/lib/auth0"
 
 import { ScimForm } from "../../../../components/provisioning/scim-form"
 
@@ -9,7 +9,7 @@ export default async function Provisioning({
 }: {
   params: { connectionId: string }
 }) {
-  const session = await appClient.getSession()
+  const session = await auth0Client.getSession()
 
   if (!session) {
     return redirect("/api/auth/login")

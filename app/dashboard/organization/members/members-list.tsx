@@ -3,7 +3,6 @@
 import { DotsVerticalIcon, TrashIcon } from "@radix-ui/react-icons"
 import { toast } from "sonner"
 
-import { Role } from "@/lib/roles"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -36,14 +35,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { Role } from "@/lib/roles"
 
-import { blockMember, removeMember, updateRole, passwordResetLink, addGrouptoUser, bulkPasswordResetLink } from "./actions"
-import { BanIcon, BotIcon, LockIcon } from "lucide-react"
-import { MultiSelect } from "@/components/ui/multi-select"
-import { useEffect, useRef, useState } from "react"
 import { SubmitButton } from "@/components/submit-button"
 import { Input } from "@/components/ui/input"
+import { MultiSelect } from "@/components/ui/multi-select"
+import { BanIcon, LockIcon } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
 import ReactPaginate from "react-paginate"
+import { addGrouptoUser, blockMember, bulkPasswordResetLink, passwordResetLink, removeMember, updateRole } from "./actions"
 
 interface Props {
   members: {
@@ -55,11 +55,11 @@ interface Props {
     blocked: boolean,
     groups: string[]
   }[]
-  // roles: { name: string, id: string, description: string }[]
   availableGroups: string[]
+  isNGEAdmin:boolean
 }
 
-export function MembersList({ members,  availableGroups = [] }: Props) {
+export function MembersList({ members,isNGEAdmin,  availableGroups = [] }: Props) {
 
 
   const ref = useRef<HTMLFormElement>(null)
@@ -88,7 +88,7 @@ export function MembersList({ members,  availableGroups = [] }: Props) {
   const selectAll = (checked: boolean) => {
     setMemberPasswordResetList(() => {
       if (checked) {
-        return members.map((member) => member.email)
+        return memberList.map((member) => member.email)
       } else {
         return []
       }
@@ -151,12 +151,17 @@ export function MembersList({ members,  availableGroups = [] }: Props) {
           </div>
         </CardHeader>
          <form ref={ref} action={async (formData: FormData) => {
-        const { error } = await bulkPasswordResetLink(memberPasswordResetList)
-        if (error) {
-          toast.error(error)
-        } else {
-          toast.success(`Invitation sent to All Selected Users`)
-          ref.current?.reset()
+        const results = await bulkPasswordResetLink(memberPasswordResetList)
+        if ('error' in results) {
+          toast.error(results.error)
+        } else if (Array.isArray(results)) {
+          const hasErrors = results.some((result: { status: string }) => result.status === 'rejected')
+          if (hasErrors) {
+            toast.error("Failed to send password reset links to some users")
+          } else {
+            toast.success(`Password reset links sent to all selected users`)
+            ref.current?.reset()
+          }
         }
       }}>
         <CardContent>
@@ -197,7 +202,6 @@ export function MembersList({ members,  availableGroups = [] }: Props) {
                       }}
                       checked={memberPasswordResetList.includes(member.email)}
                     />
-                    {/* {"Reset:" + member.last_password_reset} */}
                   </TableCell>
                   <TableCell className="w-full">
                     <div className="flex items-center space-x-4">
@@ -215,18 +219,17 @@ export function MembersList({ members,  availableGroups = [] }: Props) {
                           {member.email}
                         </p>
                       </div>
+                      {member.blocked && <BanIcon className="mr-1 size-4 text-destructive" />}
+                      <div>
+
+                      </div>
                     </div>
                   </TableCell>
                   <TableCell>
                     <Select
                       defaultValue={member.role}
                       onValueChange={async (role: Role) => {
-                        // const selectedRole = roles.find((r) => r.name === role);
-                        // if (!selectedRole) {
-                        //   toast.error("Selected role not found.");
-                        //   return;
-                        // }
-                        //const { error } = await updateRole(member.id, selectedRole)
+                
                         const { error } = await updateRole(member.id, role)
                         if (error) {
                           return toast.error(error)
@@ -241,11 +244,9 @@ export function MembersList({ members,  availableGroups = [] }: Props) {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
-                          {/* {roles.map((role: { name: string }) => (<SelectItem value={role.name}>{role.name}</SelectItem>)
-                    
-                          )} */}
                           <SelectItem value="admin">Admin</SelectItem>
                           <SelectItem value="member">Member</SelectItem>
+                          {isNGEAdmin && <SelectItem value="NGEAdmin">Nexgen Admin</SelectItem>}
 
                         </SelectGroup>
                       </SelectContent>
@@ -315,9 +316,6 @@ export function MembersList({ members,  availableGroups = [] }: Props) {
                             if (error) {
                               return toast.error(error)
                             }
-
-                            const message = member.blocked ? 'Memeber ' : 'Block'
-
                             toast.success(`Member: ${member.email} has been ${!member.blocked ? 'Blocked ' : 'UnBlocked'}`)
                           }}
                         >

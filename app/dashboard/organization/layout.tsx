@@ -1,19 +1,9 @@
-import Link from "next/link"
 import { redirect } from "next/navigation"
-import { ArrowLeftIcon } from "@radix-ui/react-icons"
 
-import { appClient,managementClient } from "@/lib/auth0"
-import { getRole } from "@/lib/roles"
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card"
 import { SidebarNav } from "@/components/sidebar-nav"
+import { auth0Client, managementClient } from "@/lib/auth0"
+import { ADMIN_ROLES, PATHS, ROLES } from "@/lib/constants"
+import { getRole } from "@/lib/roles"
 import { MembersList } from "./memberList"
 
 const sidebarNavItems = [
@@ -25,33 +15,38 @@ const sidebarNavItems = [
     title: "Members",
     href: "/dashboard/organization/members",
   },
-  // {
-  //   title: "SSO",
-  //   href: "/dashboard/organization/sso",
-  // },
-  // {
-  //   title: "Security Policies",
-  //   href: "/dashboard/organization/security-policies",
-  // },
   {
     title: "User logs",
     href: "/dashboard/organization/logs",
   },
 ]
 
+
+
 interface AccountLayoutProps {
   children: React.ReactNode
 }
 
 export default async function AccountLayout({ children }: AccountLayoutProps) {
-  const session = await appClient.getSession()
+  const session = await auth0Client.getSession()
 
   // if the user is not authenticated, redirect to login
   if (!session?.user) {
-    redirect("/api/auth/login")
+    redirect(PATHS.AUTH.LOGIN)
   }
 
-  if (getRole(session.user) !== "admin") {
+  const userRole = getRole(session.user);
+
+  if(userRole === ROLES.NGEADMIN){
+    sidebarNavItems.push({
+        title: "SSO",
+        href: "/dashboard/organization/sso",
+      });
+  }
+
+  const accessRole = ADMIN_ROLES 
+
+  if (!accessRole.includes(userRole)) {
     const { data: members } = await managementClient.organizations.getMembers({
       id: session!.user.org_id,
       fields: ["user_id", "name", "email", "picture"].join(","),

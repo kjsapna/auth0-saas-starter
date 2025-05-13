@@ -3,6 +3,7 @@ import { resolveTxt } from "node:dns/promises"
 
 import { managementClient } from "./auth0"
 import { DOMAIN_VERIFICATION_RECORD_IDENTIFIER } from "./constants"
+import { config } from "@/config"
 
 /**
  * getOrCreateDomainVerificationToken tries to fetch a domain verification token for an organization, if one exists.
@@ -63,4 +64,13 @@ export async function verifyDnsRecords(domain: string, organizationId: string) {
   }
 
   return false
+}
+
+export function isValidDomain(domain: string) {
+  if (config.node.env === "development" && domain === "example.com") {
+    return true
+  }
+
+  const domainRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/
+  return domainRegex.test(domain)
 }

@@ -3,7 +3,6 @@
 import { CopyIcon, DotsVerticalIcon, TrashIcon } from "@radix-ui/react-icons"
 import { toast } from "sonner"
 
-import { Role } from "@/lib/roles"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -27,11 +26,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { Role } from "@/lib/roles"
 
 import { revokeInvitation } from "./actions"
 
 interface Props {
-  invitations: {
+readonly  invitations: {
     id: string
     inviter: {
       name: string

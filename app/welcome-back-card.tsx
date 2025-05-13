@@ -1,5 +1,5 @@
-import Link from "next/link"
 import { ArrowRightIcon } from "lucide-react"
+import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
 
@@ -9,7 +9,7 @@ export function WelcomeBackCard() {
       <div className="flex flex-col space-y-2 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">Welcome Back!</h1>
         <p className="text-sm text-muted-foreground">
-          You are currently logged in to SaaStart.
+          You are currently logged in to Delegated Admin Console.
         </p>
       </div>
       <div className="flex justify-center">

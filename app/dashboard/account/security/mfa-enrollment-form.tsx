@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
+import { SubmitButton } from "@/components/submit-button"
 import { Badge } from "@/components/ui/badge"
 import {
   Card,
@@ -13,7 +14,6 @@ import {
 } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { SubmitButton } from "@/components/submit-button"
 
 import { createEnrollment, deleteEnrollment } from "./actions"
 
@@ -185,7 +185,7 @@ export function MFAEnrollmentForm({ factors }: MFAEnrollmentProps) {
                     ) : (
                       <form
                         action={async (formData: FormData) => {
-                          const { error, ticketUrl } =
+                          const { error, data } =
                             await createEnrollment(formData)
 
                           if (error) {
@@ -194,8 +194,8 @@ export function MFAEnrollmentForm({ factors }: MFAEnrollmentProps) {
                           }
 
                           const enrollmentPopupWindow = openPopupWindow({
-                            url: ticketUrl!,
-                            title: "SaaStart MFA Enrollment",
+                            url: data!.ticketUrl,
+                            title: "Delegated Admin MFA Enrollment",
                             width: 450,
                             height: 720,
                             scrollbars: true,

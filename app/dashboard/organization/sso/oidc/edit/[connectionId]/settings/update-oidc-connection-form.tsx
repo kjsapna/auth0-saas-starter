@@ -23,8 +23,9 @@ import { SubmitButton } from "@/components/submit-button"
 
 import { AddDomainDialog } from "../../../../components/add-domain-dialog"
 import { updateConnection } from "./actions"
+import { config } from "@/config"
 
-const CALLBACK_URL = `https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}/login/callback`
+const CALLBACK_URL = `https://${config.next.publicUrl}/login/callback`
 
 export interface OidcConnection {
   id: string

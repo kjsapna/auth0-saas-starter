@@ -1,11 +1,12 @@
 "use server"
 
-import { revalidatePath } from "next/cache"
 import { Session } from "@auth0/nextjs-auth0"
+import { revalidatePath } from "next/cache"
 
 import { managementClient } from "@/lib/auth0"
 import { verifyDnsRecords } from "@/lib/domain-verification"
 import { withServerActionAuth } from "@/lib/with-server-action-auth"
+import { PATHS, ADMIN_ROLES } from "@/lib/constants"
 
 export const updateConnection = withServerActionAuth(
   async function updateConnection(
@@ -127,7 +128,7 @@ export const updateConnection = withServerActionAuth(
         ),
       ])
 
-      revalidatePath("/dashboard/organization/sso")
+      revalidatePath(PATHS.DASHBOARD.ORGANIZATION.SSO)
     } catch (error) {
       console.error("failed to update the SSO connection", error)
       return {
@@ -138,6 +139,6 @@ export const updateConnection = withServerActionAuth(
     return {}
   },
   {
-    role: "admin",
+    role: ADMIN_ROLES
   }
 )

@@ -1,42 +1,31 @@
 "use server"
 
-import { revalidatePath } from "next/cache"
-import { Session } from "@auth0/nextjs-auth0"
-
 import { managementClient } from "@/lib/auth0"
 import { withServerActionAuth } from "@/lib/with-server-action-auth"
+import { Session } from "@auth0/nextjs-auth0"
+import { revalidatePath } from "next/cache"
+import { handleError, validateString } from "@/lib/utils"
+import { PATHS, ADMIN_ROLES } from "@/lib/constants"
 
 export const updateDisplayName = withServerActionAuth(
   async function updateDisplayName(formData: FormData, session: Session) {
     const displayName = formData.get("display_name")
 
-    if (!displayName || typeof displayName !== "string") {
-      return {
-        error: "Display name is required.",
-      }
+    if (!validateString(displayName)) {
+      return { error: "Display name is required." }
     }
 
     try {
       await managementClient.organizations.update(
-        {
-          id: session.user.org_id,
-        },
-        {
-          display_name: displayName,
-        }
+        { id: session.user.org_id },
+        { display_name: displayName }
       )
 
-      revalidatePath("/", "layout")
+      revalidatePath(PATHS.LAYOUT.ROOT, "layout")
+      return {}
     } catch (error) {
-      console.error("failed to update organization display name", error)
-      return {
-        error: "Failed to update the organization's display name.",
-      }
+      return handleError("update organization display name", error)
     }
-
-    return {}
   },
-  {
-    role: "admin",
-  }
+  { role: ADMIN_ROLES }
 )

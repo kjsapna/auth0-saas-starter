@@ -2,6 +2,7 @@
 
 import { toast } from "sonner"
 
+import { SubmitButton } from "@/components/submit-button"
 import {
   Card,
   CardContent,
@@ -12,12 +13,11 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { SubmitButton } from "@/components/submit-button"
 
 import { updateDisplayName } from "./actions"
 
 interface Props {
-  organization: {
+  readonly organization: {
     id: string
     displayName: string
     slug: string

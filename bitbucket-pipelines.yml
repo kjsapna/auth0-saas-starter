@@ -1,0 +1,35 @@
+image: atlassian/pipelines-awscli
+
+options:
+  size: 2x
+
+pipelines:
+  branches:
+    development:
+      - step:
+          name: Push to ECR
+          services:
+            - docker
+          script:
+            - aws configure set aws_access_key_id "${AWS_ACCESS_KEY_ID}"
+            - aws configure set aws_secret_access_key "${AWS_SECRET_ACCESS_KEY}"
+            - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 052958454317.dkr.ecr.us-east-1.amazonaws.com
+            - docker build --build-arg APP_BASE_URL:$APP_BASE_URL --build-arg NEXT_PUBLIC_AUTH0_DOMAIN:$NEXT_PUBLIC_AUTH0_DOMAIN --build-arg SESSION_ENCRYPTION_SECRET:$SESSION_ENCRYPTION_SECRET --build-arg AUTH0_MANAGEMENT_API_DOMAIN:$AUTH0_MANAGEMENT_API_DOMAIN --build-arg AUTH0_CLIENT_ID:$AUTH0_CLIENT_ID --build-arg AUTH0_CLIENT_SECRET:$AUTH0_CLIENT_SECRET --build-arg AUTH0_MANAGEMENT_CLIENT_ID:$AUTH0_MANAGEMENT_CLIENT_ID --build-arg AUTH0_MANAGEMENT_CLIENT_SECRET:$AUTH0_MANAGEMENT_CLIENT_SECRET --build-arg AUTH0_ADMIN_ROLE_ID:$AUTH0_ADMIN_ROLE_ID --build-arg AUTH0_MEMBER_ROLE_ID:$AUTH0_MEMBER_ROLE_ID --build-arg DEFAULT_CONNECTION_ID:$DEFAULT_CONNECTION_ID --build-arg DEFAULT_CONNECTION:$DEFAULT_CONNECTION --build-arg CUSTOM_CLAIMS_NAMESPACE:$CUSTOM_CLAIMS_NAMESPACE -t auth0-delegated-admin-console .
+            - docker tag auth0-delegated-admin-console:latest 052958454317.dkr.ecr.us-east-1.amazonaws.com/auth0-delegated-admin-console:latest
+            - docker push 052958454317.dkr.ecr.us-east-1.amazonaws.com/auth0-delegated-admin-console:latest
+      - step:
+          name: Deployment in Kubernetes
+          script:
+            - pipe: atlassian/aws-eks-kubectl-run:1.2.0
+              variables:
+                AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+                AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+                AWS_DEFAULT_REGION: "us-east-2"
+                CLUSTER_NAME: "dev-qa-eks-1apT1N4o"
+                KUBECTL_COMMAND: "rollout restart deployment tdecu-frontline-deployment -n tdecu-frontline-integration"
+                DEBUG: "true"
+
+definitions:
+  services:
+    docker:
+      memory: 7168

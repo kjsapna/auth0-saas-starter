@@ -5,16 +5,18 @@ import "./globals.css"
 import { Inter } from "next/font/google"
 import Script from "next/script"
 
-import { Toaster } from "@/components/ui/sonner"
 import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/sonner"
+import { LoadingProvider } from "@/lib/loading-context"
+import { FullScreenLoader } from "@/components/full-screen-loader"
+import { PageTransitionHandler } from "@/components/page-transition-handler"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "SaaStart | Auth0 by Okta",
+  title: "Delegated Admin Console",
   description:
-    "SaaStart is a reference B2B SaaS application built using Next.js and Auth0 by Okta.",
-  metadataBase: new URL("https://saastart.app"),
+    "Delegated Admin Console is a client user management app",
 }
 
 export default async function RootLayout({
@@ -31,7 +33,11 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <LoadingProvider>
+            <PageTransitionHandler />
+            {children}
+            <FullScreenLoader />
+          </LoadingProvider>
         </ThemeProvider>
 
         <Toaster position="bottom-right" />

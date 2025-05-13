@@ -1,11 +1,13 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { CopyIcon, InfoCircledIcon, TrashIcon } from "@radix-ui/react-icons"
 import slugify from "@sindresorhus/slugify"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { toast } from "sonner"
 
+import { Code } from "@/components/code"
+import { SubmitButton } from "@/components/submit-button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import {
@@ -28,19 +30,18 @@ import {
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
-import { Code } from "@/components/code"
-import { SubmitButton } from "@/components/submit-button"
 
 import { AddDomainDialog } from "../../components/add-domain-dialog"
 import { createConnection } from "./actions"
 
-const CALLBACK_URL = `https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}/login/callback`
+
 
 interface Props {
   domainVerificationToken: string
+  publicUrl:string
 }
 
-export function CreateSamlConnectionForm({ domainVerificationToken }: Props) {
+export function CreateSamlConnectionForm({ domainVerificationToken,publicUrl }: Props) {
   const router = useRouter()
   const [name, setName] = useState("")
   const [domains, setDomains] = useState<string[]>([])
@@ -189,7 +190,7 @@ export function CreateSamlConnectionForm({ domainVerificationToken }: Props) {
                 The request will be signed with <Code>RSA-SHA256</Code>.{" "}
                 <a
                   className="underline underline-offset-4"
-                  href={`https://${process.env.NEXT_PUBLIC_AUTH0_DOMAIN}/pem?cert=connection`}
+                  href={`https://${publicUrl}/pem?cert=connection`}
                   target="_blank"
                 >
                   Download the certificate
@@ -208,12 +209,12 @@ export function CreateSamlConnectionForm({ domainVerificationToken }: Props) {
               You will need to configure the SAML identity provider with the
               following post-back URL:
               <div className="mt-2 flex space-x-2">
-                <Input className="font-mono" value={CALLBACK_URL} readOnly />
+                <Input className="font-mono" value={`${publicUrl}/login/callback`} readOnly />
                 <Button size="icon" variant="outline" type="button">
                   <CopyIcon
                     className="size-4"
                     onClick={async () => {
-                      await navigator.clipboard.writeText(CALLBACK_URL)
+                      await navigator.clipboard.writeText(`${publicUrl}/login/callback`)
                       toast.success("Post-back URL copied to clipboard.")
                     }}
                   />

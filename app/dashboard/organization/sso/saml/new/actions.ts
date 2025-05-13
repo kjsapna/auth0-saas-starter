@@ -1,16 +1,19 @@
 "use server"
 
-import crypto from "crypto"
-import { revalidatePath } from "next/cache"
 import { Session } from "@auth0/nextjs-auth0"
 import slugify from "@sindresorhus/slugify"
+import crypto from "crypto"
+import { revalidatePath } from "next/cache"
 
 import { managementClient } from "@/lib/auth0"
 import { verifyDnsRecords } from "@/lib/domain-verification"
 import { withServerActionAuth } from "@/lib/with-server-action-auth"
+import { PATHS, ADMIN_ROLES } from "@/lib/constants"
+import { config } from "@/config"
+import { Result, error, handleError, success } from "@/lib/utils"
 
 export const createConnection = withServerActionAuth(
-  async function createConnection(formData: FormData, session: Session) {
+  async function createConnection(formData: FormData, session: Session): Promise<Result> {
     const displayName = formData.get("display_name")
     const signInUrl = formData.get("sign_in_url")
     const signOutUrl = formData.get("sign_out_url") // optional
@@ -22,36 +25,26 @@ export const createConnection = withServerActionAuth(
     const assignMembershipOnLogin = formData.get("assign_membership_on_login")
 
     if (!displayName || typeof displayName !== "string") {
-      return {
-        error: "Connection name is required.",
-      }
+      return error("Connection name is required.")
     }
 
     if (!signInUrl || typeof signInUrl !== "string") {
-      return {
-        error: "Sign-in URL is required.",
-      }
+      return error("Sign-in URL is required.")
     }
 
     if (!certificate || !(certificate instanceof File)) {
-      return {
-        error: "Certificate is required.",
-      }
+      return error("Certificate is required.")
     }
 
     if (!protocolBinding || typeof protocolBinding !== "string") {
-      return {
-        error: "Protocol binding is required.",
-      }
+      return error("Protocol binding is required.")
     }
 
     if (
       !assignMembershipOnLogin ||
       typeof assignMembershipOnLogin !== "string"
     ) {
-      return {
-        error: "Auto-membership is required.",
-      }
+      return error("Auto-membership is required.")
     }
 
     const parsedDomains =
@@ -64,9 +57,7 @@ export const createConnection = withServerActionAuth(
       const verified = await verifyDnsRecords(domain, session.user.org_id)
 
       if (!verified) {
-        return {
-          error: `The domain ${domain} is not verified.`,
-        }
+        return error(`The domain ${domain} is not verified.`)
       }
     }
 
@@ -90,7 +81,7 @@ export const createConnection = withServerActionAuth(
         // unique and we want to avoid collisions when supplied by the user
         name: `${slugify(displayName)}-${crypto.randomBytes(4).toString("hex")}`,
         strategy: "samlp",
-        enabled_clients: [process.env.AUTH0_CLIENT_ID],
+        enabled_clients: [config.auth0.clientId],
         options: samlOptions,
       })
 
@@ -103,18 +94,15 @@ export const createConnection = withServerActionAuth(
         }
       )
 
-      revalidatePath("/dashboard/organization/sso")
-    } catch (error) {
-      console.error("failed to create the SSO connection", error)
-      return {
-        error: "Failed to create the SSO connection.",
-      }
+      revalidatePath(PATHS.DASHBOARD.ORGANIZATION.SSO)
+    } catch (err) {
+      return handleError("create the SSO connection", err)
     }
 
-    return {}
+    return success(undefined)
   },
   {
-    role: "admin",
+    role: ADMIN_ROLES,
   }
 )
 
@@ -144,7 +132,7 @@ export const deleteConnection = withServerActionAuth(
         id: connectionId,
       })
 
-      revalidatePath("/dashboard/organization/sso")
+      revalidatePath(PATHS.DASHBOARD.ORGANIZATION.SSO)
 
       return {}
     } catch (error) {
@@ -155,6 +143,6 @@ export const deleteConnection = withServerActionAuth(
     }
   },
   {
-    role: "admin",
+    role: ADMIN_ROLES,
   }
 )

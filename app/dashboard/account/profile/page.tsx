@@ -1,5 +1,6 @@
-import { appClient, onboardingClient } from "@/lib/auth0"
 import { PageHeader } from "@/components/page-header"
+import { auth0Client } from "@/lib/auth0"
+import { config } from "@/config"
 
 import { ChangePasswordForm } from "./change-password-form"
 import { DeleteAccountForm } from "./delete-account-form"
@@ -13,26 +14,30 @@ interface UserProfile {
   username?: string
   email?: string
   phone_number?: string
+  user_metadata?:{
+    phoneNumber?:string
+  }
 
 }
-export default appClient.withPageAuthRequired(
+export default auth0Client.withPageAuthRequired(
   async function Profile() {
-    const session = await appClient.getSession()
+    const session = await auth0Client.getSession()
     const getUserProfile = (): UserProfile => {
       const user = session?.user;
       if (!user) {
         return {}
       }
 
-      const user_metadata = session.user[process.env.CUSTOM_CLAIMS_NAMESPACE + 'user_metadata'];
+      const user_metadata = session.user[config.auth0.customNamespace + 'user_metadata'];
 
       return {
-        phone_number: user_metadata?.phone_number || "",
-        given_name: user.given_name || "",
-        family_name: user.family_name || "",
-        nickname: user.nickname || "",
-        username: user.username || "",
-        email: user.email || "",
+        phone_number: user_metadata?.phoneNumber ?? "",
+        given_name: user.given_name ?? "",
+        family_name: user.family_name ?? "",
+        nickname: user.nickname ?? "",
+        username: user.username ?? "",
+        email: user.email ?? "",
+        user_metadata:user_metadata
       }
     }
 

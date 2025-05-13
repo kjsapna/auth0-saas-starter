@@ -1,7 +1,6 @@
 "use client"
 
-import { toast } from "sonner"
-import { z } from "zod";
+import { SubmitButton } from "@/components/submit-button";
 import {
   Card,
   CardContent,
@@ -9,12 +8,13 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { SubmitButton } from "@/components/submit-button"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
-import { updateDisplayName } from "./actions"
+import { useState } from "react";
+import { updateDisplayName } from "./actions";
 
 interface UserProfile {
   phone_number?: string
@@ -23,15 +23,33 @@ interface UserProfile {
   nickname?: string
   username?: string
   email?:string
+  user_metadata?:{
+    phoneNumber?:string
+  }
 }
 interface Props {
-  displayName: string
-  userProfile?: UserProfile
+  readonly displayName: string
+  readonly userProfile?: UserProfile
 }
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 
 export function DisplayNameForm({ displayName, userProfile }: Props) {
+  const [email, setEmail] = useState(userProfile?.email ?? "");
+  const [emailError, setEmailError] = useState("");
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEmail(value);
+    if (value && !emailRegex.test(value)) {
+      setEmailError("Please enter a valid email address");
+    } else {
+      setEmailError("");
+    }
+  };
+
+
   return (
     <Card>
       <form
@@ -70,8 +88,13 @@ export function DisplayNameForm({ displayName, userProfile }: Props) {
               id="email"
               name="email"
               type="text"
-              defaultValue={userProfile?.email || ""}
+              defaultValue={userProfile?.email ?? ""}
+              onChange={handleEmailChange}
+              className={emailError ? "border-red-500" : ""}
             />
+            {emailError && (
+                <p className="text-red-500 text-sm mt-1">{emailError}</p> 
+            )}
           </div>
           <div className="grid w-full max-w-sm items-center gap-1.5">
             <Label htmlFor="given_name">Given Name</Label>
@@ -80,7 +103,7 @@ export function DisplayNameForm({ displayName, userProfile }: Props) {
               name="given_name"
               type="text"
               placeholder="John"
-              defaultValue={userProfile?.given_name || ""}
+              defaultValue={userProfile?.given_name ?? ""}
             />
           </div>
           <div className="grid w-full max-w-sm items-center gap-1.5">
@@ -90,7 +113,7 @@ export function DisplayNameForm({ displayName, userProfile }: Props) {
               name="family_name"
               type="text"
               placeholder="Smith"
-              defaultValue={userProfile?.family_name || ""}
+              defaultValue={userProfile?.family_name ?? ""}
             />
           </div>
           <div className="grid w-full max-w-sm items-center gap-1.5">
@@ -100,7 +123,7 @@ export function DisplayNameForm({ displayName, userProfile }: Props) {
               name="username"
               type="text"
               placeholder="johnsmith"
-              defaultValue={userProfile?.username || ""}
+              defaultValue={userProfile?.username ?? ""}
             />
           </div>
           <div className="grid w-full max-w-sm items-center gap-1.5">
@@ -110,7 +133,7 @@ export function DisplayNameForm({ displayName, userProfile }: Props) {
               name="phone_number"
               type="tel"
               placeholder="+15551234567"
-              defaultValue={userProfile?.phone_number || ""}
+              defaultValue={userProfile?.user_metadata?.phoneNumber ?? ""}
             />
           </div>
           <div className="grid w-full max-w-sm items-center gap-1.5">
@@ -120,7 +143,7 @@ export function DisplayNameForm({ displayName, userProfile }: Props) {
               name="nickname"
               type="text"
               placeholder="Johnny"
-              defaultValue={userProfile?.nickname || ""}
+              defaultValue={userProfile?.nickname ?? ""}
             />
           </div>
         </CardContent>

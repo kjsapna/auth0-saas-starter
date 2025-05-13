@@ -1,6 +1,5 @@
 import Link from "next/link"
 
-import { Auth0Logo } from "@/components/auth0-logo"
 
 import { CreateOrganizationForm } from "./create-organization-form"
 
@@ -10,24 +9,22 @@ export default async function Create() {
       <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
         <div className="absolute inset-0 bg-zinc-900" />
         <div className="relative z-20 flex items-center text-lg font-medium">
-          <Auth0Logo className="mr-2 size-8" />
-          <span className="font-mono font-medium">SaaStart</span>
+          <img className="mr-2 size-8"
+              src="https://nextgen.widen.net/content/mcckjhwu0f/original/NG_Logo_Final_RGB.svg?u=yye1mp"
+              alt="NextGen Logo"
+          />
+          <span className="font-mono font-medium">NextGen </span>
         </div>
         <div className="relative z-20 mt-auto">
           <blockquote className="space-y-2">
             <div className="space-y-1">
+            
               <p className="text-lg">
-                SaaStart is a reference B2B SaaS application built using Next.js
-                and Auth0 by Okta.
-              </p>
-              <p className="text-lg">
-                It features multi-tenancy support, user management and access
-                controls, security policies, self-service Single Sign-On
-                configuration and more out-of-the-box.
+               NextGen Delegated Admin Console is application for managing user by Client Admin
               </p>
             </div>
             <footer className="text-sm text-muted-foreground">
-              — Built by Auth0 by Okta
+                NextGen Client Dashbord
             </footer>
           </blockquote>
         </div>

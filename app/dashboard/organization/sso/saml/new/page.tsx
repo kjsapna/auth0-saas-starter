@@ -1,20 +1,18 @@
-import Link from "next/link"
-import { ArrowLeftIcon } from "@radix-ui/react-icons"
 
-import { appClient } from "@/lib/auth0"
-import { getOrCreateDomainVerificationToken } from "@/lib/domain-verification"
-import { Button } from "@/components/ui/button"
 import { AppBreadcrumb } from "@/components/app-breadcrumb"
+import { auth0Client } from "@/lib/auth0"
+import { getOrCreateDomainVerificationToken } from "@/lib/domain-verification"
 
+import { config } from "@/config"
 import { CreateSamlConnectionForm } from "./create-saml-connection-form"
 
 export default async function CreateSamlConnection() {
-  const session = await appClient.getSession()
+  const session = await auth0Client.getSession()
 
   const domainVerificationToken = await getOrCreateDomainVerificationToken(
     session!.user.org_id
   )
-
+const publicUrl = `https://${config.next.publicUrl}`
   return (
     <div className="space-y-1">
       <div className="px-2 py-3">
@@ -26,6 +24,7 @@ export default async function CreateSamlConnection() {
 
       <CreateSamlConnectionForm
         domainVerificationToken={domainVerificationToken}
+        publicUrl={publicUrl}
       />
     </div>
   )

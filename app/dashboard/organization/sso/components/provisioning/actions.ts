@@ -1,10 +1,11 @@
 "use server"
 
-import { revalidatePath } from "next/cache"
 import { Session } from "@auth0/nextjs-auth0"
+import { revalidatePath } from "next/cache"
 
 import { managementClient } from "@/lib/auth0"
 import { withServerActionAuth } from "@/lib/with-server-action-auth"
+import { ADMIN_ROLES } from "@/lib/constants"
 
 const connStrategyToSlug: {
   [key: string]: string
@@ -49,7 +50,7 @@ export const createScimConfig = withServerActionAuth(
     return {}
   },
   {
-    role: "admin",
+    role: ADMIN_ROLES,
   }
 )
 
@@ -86,7 +87,7 @@ export const deleteScimConfig = withServerActionAuth(
     return {}
   },
   {
-    role: "admin",
+    role: ADMIN_ROLES,
   }
 )
 
@@ -144,7 +145,7 @@ export const updateScimConfig = withServerActionAuth(
     return {}
   },
   {
-    role: "admin",
+    role: ADMIN_ROLES,
   }
 )
 
@@ -187,7 +188,7 @@ export const createScimToken = withServerActionAuth(
     }
   },
   {
-    role: "admin",
+    role: ADMIN_ROLES,
   }
 )
 
@@ -229,6 +230,6 @@ export const deleteScimToken = withServerActionAuth(
     return {}
   },
   {
-    role: "admin",
+    role: ADMIN_ROLES,
   }
 )

@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import {
   DotsVerticalIcon,
   GearIcon,
@@ -8,6 +7,7 @@ import {
   PlusIcon,
   TrashIcon,
 } from "@radix-ui/react-icons"
+import Link from "next/link"
 import { toast } from "sonner"
 
 import {
