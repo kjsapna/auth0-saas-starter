@@ -1,7 +1,6 @@
-import Link from "next/link"
-
-
-import { CreateOrganizationForm } from "./create-organization-form"
+import Image from "next/image";
+import Link from "next/link";
+import { CreateOrganizationForm } from "./create-organization-form";
 
 export default async function Create() {
   return (
@@ -9,9 +8,11 @@ export default async function Create() {
       <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
         <div className="absolute inset-0 bg-zinc-900" />
         <div className="relative z-20 flex items-center text-lg font-medium">
-          <img className="mr-2 size-8"
+          <Image className="mr-2 size-8"
               src="https://nextgen.widen.net/content/mcckjhwu0f/original/NG_Logo_Final_RGB.svg?u=yye1mp"
               alt="NextGen Logo"
+              width={32}
+              height={32}
           />
           <span className="font-mono font-medium">NextGen </span>
         </div>
