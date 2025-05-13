@@ -5,11 +5,12 @@ import "./globals.css"
 import { Inter } from "next/font/google"
 import Script from "next/script"
 
+import { FullScreenLoader } from "@/components/full-screen-loader"
+import { PageTransitionHandler } from "@/components/page-transition-handler"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import { LoadingProvider } from "@/lib/loading-context"
-import { FullScreenLoader } from "@/components/full-screen-loader"
-import { PageTransitionHandler } from "@/components/page-transition-handler"
+import { Suspense } from "react"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -34,8 +35,12 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <LoadingProvider>
+          <Suspense fallback={<div>Loading transitions...</div>}>
             <PageTransitionHandler />
+            </Suspense>
+            <Suspense fallback={<div>Loading...</div>}>
             {children}
+            </Suspense>
             <FullScreenLoader />
           </LoadingProvider>
         </ThemeProvider>
